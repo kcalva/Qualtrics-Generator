@@ -10,6 +10,7 @@ const CreateQuestions = (props)=> {
     const [questionData, setQuestionData] = useState()
 
     const createSurvey = async (params) => {
+        
         const surveyData = JSON.stringify({
           "SurveyName": params.surveyName,
           "Language": "EN",
@@ -26,6 +27,22 @@ const CreateQuestions = (props)=> {
         //Creating the survey
         const createSurveyres = await fetch("https://iad1.qualtrics.com/API/v3/survey-definitions", surveyRequestOptions)
         const surveyObj =  await createSurveyres.json()
+
+        const surveyMetaData = JSON.stringify({
+            "SurveyStatus": "Active",
+        })
+        
+        const updateMetaDataRequestOptions = {
+            method: 'PUT',
+            headers: props.myHeaders,
+            body: surveyMetaData,
+            redirect: 'follow'
+        }
+        
+        //Update metadata for Survey to set its status to active
+        const updateMetadataRes = await fetch(`https://iad1.qualtrics.com/API/v3/survey-definitions/${surveyObj.result.SurveyID}/metadata`, updateMetaDataRequestOptions)
+        const updateMetaDataObj = await updateMetadataRes.json()
+        console.log('making survey active ', updateMetaDataObj)
         
         setSurveyID(surveyObj.result.SurveyID)
         return surveyObj.result.SurveyID
