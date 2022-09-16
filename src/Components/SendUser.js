@@ -84,8 +84,8 @@ const SendUser = (props) => {
           "header": {
             "fromEmail": "apiexample@qualtrics.com",
             "replyToEmail": "apiexample@qualtrics.com",
-            "fromName": "Test Name 1",
-            "subject": "Example Subject 1"
+            "fromName": "Test Name",
+            "subject": "Example Subject"
           },
           "surveyLink": {
             "surveyId": props.surveyID,

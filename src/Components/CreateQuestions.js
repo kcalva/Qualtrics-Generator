@@ -1,5 +1,6 @@
 import React from 'react'
 import { useState } from 'react'
+import ExportData from './ExportData'
 import SendUser from './SendUser'
 import UpdateQuestion from './UpdateQuestion'
 
@@ -152,6 +153,7 @@ const CreateQuestions = (props)=> {
             
             {/* <UpdateQuestion myHeaders={props.myHeaders} surveyID={surveyID} questionID={questionID} questionData={questionData}/> */}
             <SendUser myHeaders={props.myHeaders} surveyID={surveyID}/>
+            <ExportData myHeaders={props.myHeaders} surveyID={surveyID}/>
         </>
     )
 }
