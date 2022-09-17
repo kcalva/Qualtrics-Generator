@@ -4,7 +4,7 @@ const UpdateQuestion = (props) => {
     const getQuestionId = () =>{
         if(props.questionID === undefined){
             console.log('questionID not defined: creating question... ')
-            // createQuestion()
+            props.createQuestion()
         }
     }
   

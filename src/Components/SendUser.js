@@ -31,7 +31,7 @@ const SendUser = (props) => {
         mailingListId = mailingListObj.result.id
     
         return mailingListId
-      }
+    }
 
     const getMailingListId = async (params) => {
 
