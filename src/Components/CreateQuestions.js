@@ -147,7 +147,7 @@ const CreateQuestions = (props)=> {
     return (
         <>
             <textarea value={surveyName} onChange={(e)=>{setSurveyName(e.target.value)}}/>
-            <button onClick={()=>{createQuestion({surveyName})}} className='button'>
+            <button onClick={()=>{createQuestion({surveyName})}} className='Button'>
                 Click to add questions
             </button>
             

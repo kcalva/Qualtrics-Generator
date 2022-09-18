@@ -9,8 +9,15 @@
   flex-direction: column;
   align-items: center;
   justify-content: space-evenly;
+  color: white;
 }
 
-.button{
+.Button {
   font-size: calc(10px + 2vmin);
+}
+
+.SendUser-Container {
+  display: flex;
+  width: 45vw;
+  justify-content: space-evenly;
 }

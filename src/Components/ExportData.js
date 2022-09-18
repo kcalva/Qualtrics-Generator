@@ -46,7 +46,7 @@ const ExportData = (props) => {
 
     return (
         <>
-            <button onClick={()=>{exportingData()}} className='button'>
+            <button onClick={()=>{exportingData()}} className='Button'>
                 Click to Export Data
             </button>
         </>

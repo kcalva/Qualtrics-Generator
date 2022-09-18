@@ -12,6 +12,13 @@ const SendUser = (props) => {
     const [extRef, setExtRef] = useState('')
     const [embeddedData, setEmbeddedData] = useState()
 
+    const [linkText, setLinkText] = useState('')
+    const [linkMetaData, setLinkMetaData] = useState('')
+    const [fromEmail, setFromEmail] = useState('')
+    const [replyToEmail, setReplyToEmail] = useState('')
+    const [fromName, setFromName] = useState('')
+    const [subject, setSubject] = useState()
+
     let mailingListId
 
     const createMailingList = async (params) => {
@@ -68,7 +75,7 @@ const SendUser = (props) => {
         const addContactObj = await addContactRes.json()
         console.log('adding contacts to mailing list obj ',addContactObj)
     
-        const linkWrapper = "<a href=${l://SurveyURL}&Q1=1>click here</a>"
+        const linkWrapper = "<a href=${l://SurveyURL}&" + params.linkMetaData +">"+ params.linkText + "</a>"
     
         const timeElapsed = Date.now()
         const today = new Date(timeElapsed)
@@ -82,10 +89,10 @@ const SendUser = (props) => {
             "contactId": addContactObj.result.contactLookupId     
           },
           "header": {
-            "fromEmail": "apiexample@qualtrics.com",
-            "replyToEmail": "apiexample@qualtrics.com",
-            "fromName": "Test Name",
-            "subject": "Example Subject"
+            "fromEmail": params.fromEmail,
+            "replyToEmail": params.replyToEmail,
+            "fromName": params.fromName,
+            "subject": params.subject
           },
           "surveyLink": {
             "surveyId": props.surveyID,
@@ -109,13 +116,37 @@ const SendUser = (props) => {
       }
     return (
         <>
-            <textarea value={mailingListName} onChange={(e)=>{setMailingListName(e.target.value)}}/>
-            <textarea value={firstName} onChange={(e)=>{setFirstName(e.target.value)}}/>
-            <textarea value={lastName} onChange={(e)=>{setLastName(e.target.value)}}/>
-            <textarea value={email} onChange={(e)=>{setEmail(e.target.value)}}/>
-            <textarea value={extRef} onChange={(e)=>{setExtRef(e.target.value)}}/>
-            <textarea value={embeddedData} onChange={(e)=>{setEmbeddedData(e.target.value)}}/>
-            <button onClick={()=>{sendUser({ mailingListName,firstName,lastName,email,extRef,embeddedData })}} className='button'>
+            <div className='SendUser-Container'>
+                <div style={{display:"flex", flexDirection: "column"}}>
+                    <label>MailingList Name</label>
+                    <textarea value={mailingListName} onChange={(e)=>{setMailingListName(e.target.value)}}/>
+                    <label>First Name</label>
+                    <textarea value={firstName} onChange={(e)=>{setFirstName(e.target.value)}}/>
+                    <label>Last Name</label>
+                    <textarea value={lastName} onChange={(e)=>{setLastName(e.target.value)}}/>
+                    <label>Email</label>
+                    <textarea value={email} onChange={(e)=>{setEmail(e.target.value)}}/>
+                    <label>External Reference</label>
+                    <textarea value={extRef} onChange={(e)=>{setExtRef(e.target.value)}}/>
+                    <label>Embedded Data <br/>(must be in JSON form ex. {`{ showQ1 : "true" }`})</label>
+                    <textarea value={embeddedData} onChange={(e)=>{setEmbeddedData(e.target.value)}}/>
+                </div>
+                <div style={{display:"flex", flexDirection: "column"}}>
+                    <label>Link Description</label>
+                    <textarea value={linkText} onChange={(e)=>{setLinkText(e.target.value)}}/>
+                    <label>Link MetaData</label>
+                    <textarea value={linkMetaData} onChange={(e)=>{setLinkMetaData(e.target.value)}}/>
+                    <label>From Email</label>
+                    <textarea value={fromEmail} onChange={(e)=>{setFromEmail(e.target.value)}}/>
+                    <label>Reply To Email</label>
+                    <textarea value={replyToEmail} onChange={(e)=>{setReplyToEmail(e.target.value)}}/>
+                    <label>From</label>
+                    <textarea value={fromName} onChange={(e)=>{setFromName(e.target.value)}}/>
+                    <label>Subject</label>
+                    <textarea value={subject} onChange={(e)=>{setSubject(e.target.value)}}/>
+                </div>
+            </div>
+            <button onClick={()=>{sendUser({ mailingListName,firstName,lastName,email,extRef,embeddedData, linkText, linkMetaData, fromEmail, replyToEmail,fromName, subject })}} className='Button'>
                 Click to send to user!
             </button>
         </>  

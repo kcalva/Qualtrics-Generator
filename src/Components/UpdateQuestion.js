@@ -29,7 +29,7 @@ const UpdateQuestion = (props) => {
 
   return (
     <>
-        <button onClick={updateQuestion} className='button'>
+        <button onClick={updateQuestion} className='Button'>
             Click to update question
         </button>  
     </>
