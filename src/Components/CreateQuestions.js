@@ -1,5 +1,4 @@
-import React from 'react'
-import { useState } from 'react'
+import React, { useState } from 'react'
 import ExportData from './ExportData'
 import SendUser from './SendUser'
 import UpdateQuestion from './UpdateQuestion'
@@ -7,12 +6,15 @@ import UpdateQuestion from './UpdateQuestion'
 const CreateQuestions = (props)=> {
     const [surveyName, setSurveyName] = useState('')
     const [surveyID, setSurveyID] = useState()
-    const [questionID, setQuestionID] = useState()
-    // const [questionData, setQuestionData] = useState()
+    const [questionText, setQuestionText] = useState('')
+    const [exportTag, setExportTag] = useState('')
+    const [leftOperand, setLeftOperand] = useState('')
+    const [rightOperand, setRightOperand] = useState('')
+    const[questionIDList, setQuestionIDList] = useState([])
 
     const initialQuestionData = JSON.stringify({
-        "QuestionText": "I am treated with respect at work",
-        "DataExportTag": "Q1",
+        "QuestionText": questionText,
+        "DataExportTag": exportTag,
         "QuestionType": "MC",
         "Selector": "SAHR",
         "SubSelector": "TX",
@@ -20,7 +22,7 @@ const CreateQuestions = (props)=> {
             "QuestionDescriptionOption": "UseText",
             "LabelPosition": "BELOW"
         },
-        "QuestionDescription": "I am treated with respect at work",
+        "QuestionDescription": questionText,
         "Choices": {
             "1": {
                 "Display": "Strongly disagree"
@@ -55,7 +57,6 @@ const CreateQuestions = (props)=> {
         "Language": [],
         "NextChoiceId": 6,
         "NextAnswerId": 1,
-        "QuestionID": "QID1",
         "DataVisibility": {
             "Private": false,
             "Hidden": false
@@ -64,18 +65,18 @@ const CreateQuestions = (props)=> {
             "0": {
                 "0": {
                     "LogicType": "EmbeddedField",
-                    "LeftOperand": "Q1",
+                    "LeftOperand": leftOperand,
                     "Operator": "EqualTo",
-                    "RightOperand": "1",
+                    "RightOperand": rightOperand,
                     "Type": "Expression",
-                    "Description": "<span class=\"ConjDesc\">If</span>  <span class=\"LeftOpDesc\">Q1</span> <span class=\"OpDesc\">Is Equal to</span> <span class=\"RightOpDesc\"> 1 </span>"
+                    "Description": "<span class=\"ConjDesc\">If</span>  <span class=\"LeftOpDesc\">"+leftOperand+"</span> <span class=\"OpDesc\">Is Equal to</span> <span class=\"RightOpDesc\">" + rightOperand +"</span>"
                 },
                 "Type": "If"
             },
             "Type": "BooleanExpression",
             "inPage": false
         },
-        "QuestionText_Unsafe": "I am treated with respect at work"
+        "QuestionText_Unsafe": questionText
     })
 
     const createSurvey = async (params) => {
@@ -140,18 +141,27 @@ const CreateQuestions = (props)=> {
         const res = await fetch(`https://iad1.qualtrics.com/API/v3/survey-definitions/${newSurveyId}/questions`, questionRequestOptions)
         const questionObj =  await res.json()
         console.log('Question created')
-        setQuestionID(questionObj.result.QuestionID)
-        // setQuestionData(initialQuestionData)
+        setQuestionIDList((prevState)=>[...prevState, questionObj.result.QuestionID])
+        console.log(questionIDList)
     }
 
     return (
         <>
+            <label>Survey Name</label>
             <textarea value={surveyName} onChange={(e)=>{setSurveyName(e.target.value)}}/>
+            <label>Question Text</label>
+            <textarea value={questionText} onChange={(e)=>{setQuestionText(e.target.value)}}/>
+            <label>Question Tag</label>
+            <textarea value={exportTag} onChange={(e)=>{setExportTag(e.target.value)}}/>
+            <label>MetaData Name</label>
+            <textarea value={leftOperand} onChange={(e)=>{setLeftOperand(e.target.value)}}/>
+            <label>MetaData Value</label>
+            <textarea value={rightOperand} onChange={(e)=>{setRightOperand(e.target.value)}}/>
             <button onClick={()=>{createQuestion({surveyName})}} className='Button'>
                 Click to add questions
             </button>
             
-            <UpdateQuestion myHeaders={props.myHeaders} surveyID={surveyID} questionID={questionID} questionData={initialQuestionData} createQuestion={createQuestion}/>
+            <UpdateQuestion myHeaders={props.myHeaders} surveyID={surveyID} questionIDList={questionIDList} questionData={initialQuestionData} createQuestion={createQuestion}/>
             <SendUser myHeaders={props.myHeaders} surveyID={surveyID}/>
             <ExportData myHeaders={props.myHeaders} surveyID={surveyID}/>
         </>
