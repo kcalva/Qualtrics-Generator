@@ -23,13 +23,143 @@ const CreateQuestions = (props)=> {
        
     },[props.myHeaders, props.surveyID]);
 
-    const createQuestion =  async (surveyID, firstQuestionData, numQuestions) =>{
 
-        const secondQuestionData = JSON.stringify({
-            "QuestionText": "Please Explain why&nbsp;",
+    const publishSurvey = () => {
+        const surveyMetaData = JSON.stringify({
+            "SurveyStatus": "Active",
+        })
+        
+        const updateMetaDataRequestOptions = {
+            method: 'PUT',
+            headers: props.myHeaders,
+            body: surveyMetaData,
+            redirect: 'follow'
+        }
+        
+        //Update metadata for Survey to set its status to active
+        fetch(`https://iad1.qualtrics.com/API/v3/survey-definitions/${props.surveyID}/metadata`, updateMetaDataRequestOptions)
+    }
+
+
+    const getRatingQuestionData = (questionTag,qID,numChoices,questionText) => {
+
+        console.log(`Getting rating question data for ${questionTag} with ${numChoices} choices and text: ${questionText}`)
+
+        const questionJson = JSON.stringify({
+            "QuestionText": questionText,
+            "QuestionDescription": questionText,
+            "QuestionText_Unsafe": questionText,
+
+            "DataExportTag": questionTag,
+            "QuestionID": qID,
+
+            "DisplayLogic": {
+                "0": {
+                    "0": {
+                        "LogicType": "EmbeddedField",
+                        "LeftOperand": `sf${questionTag}`,
+                        "Operator": "EqualTo",
+                        "RightOperand": "1",
+                        "Type": "Expression",
+                    },
+                    "Type": "If"
+                },
+                "Type": "BooleanExpression",
+                "inPage": false
+            },
+
+            "Choices": 
+            numChoices === "4"?{
+                "1": {"Display": "Strongly disagree"},
+                "2": {"Display": "Disagree"},
+                "3": {"Display": "Agree"},
+                "4": {"Display": "Strongly agree"}
+            }:
+            numChoices === "7"?{
+                "1": {"Display": "Strongly disagree"},
+                "2": {"Display": "Disagree"},
+                "3": {"Display": "Somewhat disagree"},
+                "4": {"Display": "Neither agree nor disagree"},
+                "5": {"Display": "Somewhat agree"},
+                "6": {"Display": "Agree"},
+                "7": {"Display": "Strongly agree"}
+            }:{ // default to 5
+                "1": {"Display": "Strongly disagree"},
+                "2": {"Display": "Disagree"},
+                "3": {"Display": "Neither agree nor disagree"},
+                "4": {"Display": "Agree"},
+                "5": {"Display": "Strongly agree"}
+            },
+            "ChoiceOrder": 
+                numChoices === "4"?[1,2,3,4]:
+                numChoices === "7"?[1,2,3,4,5,6,7]:
+                [1,2,3,4,5], // default
+
+            "QuestionType": "MC",
+            "Selector": "SAHR",
+            "SubSelector": "TX",
+            "Configuration": {
+                "QuestionDescriptionOption": "UseText",
+                "LabelPosition": "BELOW"
+            },            
+            "Validation": {
+                "Settings": {
+                    "ForceResponse": "OFF",
+                    "ForceResponseType": "ON",
+                    "Type": "None"
+                }
+            },
+            "Language": [],
+            "DataVisibility": {
+                "Private": false,
+                "Hidden": false
+            }
+        })
+
+        return questionJson;
+                
+    }
+
+    const getTextEntryQuestionData = (questionTag,QID,refQID,numChoices,questionText="Please explain why.") => {
+
+        console.log(`Getting text entry question data for ${QID} with ${numChoices} choices and text: ${questionText}`)
+
+        const questionJson = JSON.stringify({
+            "QuestionText": questionText,
+            "QuestionText_Unsafe": questionText,
+
+            "DataExportTag": questionTag + "_why",
+            "QuestionID": QID,
+
+            "DisplayLogic": {
+                "0": {
+                    "0": {
+                        "LogicType": "Question",
+                        "QuestionID": refQID,
+                        "QuestionIsInLoop": "no",
+                        "ChoiceLocator": `q://${refQID}/SelectableChoice/1`,
+                        "Operator": "Selected",
+                        "QuestionIDFromLocator": `${refQID}`,
+                        "LeftOperand": `q://${refQID}/SelectableChoice/1`,
+                        "Type": "Expression",
+                    },
+                    "1": {
+                        "LogicType": "Question",
+                        "QuestionID": refQID,
+                        "QuestionIsInLoop": "no",
+                        "ChoiceLocator": `q://${refQID}/SelectableChoice/${numChoices}`,
+                        "Operator": "Selected",
+                        "QuestionIDFromLocator": `${refQID}`,
+                        "LeftOperand": `q://${refQID}/SelectableChoice/${numChoices}`,
+                        "Type": "Expression",
+                        "Conjuction": "Or"
+                    },
+                    "Type": "If"
+                },
+                "Type": "BooleanExpression",
+                "inPage": false
+            },
             "DefaultChoices": false,
-            "DataExportTag": "Q" + (numQuestions + 2),
-            "QuestionID": "QID" + (numQuestions + 2),
             "QuestionType": "TE",
             "Selector": "SL",
             "Configuration": {
@@ -47,56 +177,42 @@ const CreateQuestions = (props)=> {
             "SearchSource": {
                 "AllowFreeResponse": "false"
             },
-            "DisplayLogic": {
-                "0": {
-                    "0": {
-                        "LogicType": "Question",
-                        "QuestionID": "QID" + (numQuestions + 1),
-                        "QuestionIsInLoop": "no",
-                        "ChoiceLocator": `q://QID${ (numQuestions + 1)}/SelectableChoice/1`,
-                        "Operator": "Selected",
-                        "QuestionIDFromLocator": "QID" + (numQuestions + 1),
-                        "LeftOperand": `q://QID${ (numQuestions + 1)}/SelectableChoice/1`,
-                        "Type": "Expression",
-                        "Description": "<span class=\"ConjDesc\">If</span> <span class=\"QuestionDesc\">is this working?</span> <span class=\"LeftOpDesc\">Strongly disagree</span> <span class=\"OpDesc\">Is Selected</span> "
-                    },
-                    "1": {
-                        "LogicType": "Question",
-                        "QuestionID": "QID" + (numQuestions + 1),
-                        "QuestionIsInLoop": "no",
-                        "ChoiceLocator": `q://QID${ (numQuestions + 1)}/SelectableChoice/5`,
-                        "Operator": "Selected",
-                        "QuestionIDFromLocator": "QID" + (numQuestions + 1),
-                        "LeftOperand": `q://QID${ (numQuestions + 1)}/SelectableChoice/5`,
-                        "Type": "Expression",
-                        "Description": "<span class=\"ConjDesc\">Or</span> <span class=\"QuestionDesc\">is this working?</span> <span class=\"LeftOpDesc\">Strongly agree</span> <span class=\"OpDesc\">Is Selected</span> ",
-                        "Conjuction": "Or"
-                    },
-                    "Type": "If"
-                },
-                "Type": "BooleanExpression",
-                "inPage": false
-            },
-            "QuestionText_Unsafe": "Please Explain why&nbsp;"
+
         })
 
-        const firstQuestionRequestOptions = {
+        return questionJson;
+    }
+
+
+    const createQuestion = async (surveyID, questionObject) => {
+        const options = {
             method: 'POST',
             headers: props.myHeaders,
-            body: firstQuestionData,
+            body: questionObject,
             redirect: 'follow'
         }
 
-        const secondQuestionRequestOptions = {
-            method: 'POST',
+        await fetch(`https://iad1.qualtrics.com/API/v3/survey-definitions/${surveyID}/questions`, options)
+    }
+
+    const updateQuestion = async (surveyID, questionObject) => {
+        const options = {
+            method: 'PUT',
             headers: props.myHeaders,
-            body: secondQuestionData,
+            body: questionObject,
             redirect: 'follow'
         }
 
-        //Creating the questions we want 
-        await fetch(`https://iad1.qualtrics.com/API/v3/survey-definitions/${surveyID}/questions`, firstQuestionRequestOptions)
-        await fetch(`https://iad1.qualtrics.com/API/v3/survey-definitions/${surveyID}/questions`, secondQuestionRequestOptions)
+        await fetch(`https://iad1.qualtrics.com/API/v3/survey-definitions/${surveyID}/questions/${questionObject.QuestionID}`, options)
+        console.log('question updated')
+    }
+
+    const createQuestionPair =  async (surveyID) =>{
+        const ratingQuestion = getRatingQuestionData()
+        const textEntryQuestion = getTextEntryQuestionData()
+
+        await createQuestion(surveyID,ratingQuestion)
+        await createQuestion(surveyID,textEntryQuestion)
 
         console.log('questions created')
     }
@@ -115,122 +231,34 @@ const CreateQuestions = (props)=> {
         const getQuestionsRes = await fetch(`https://iad1.qualtrics.com/API/v3/survey-definitions/${surveyID}/questions`, getQuestionsDataRequestOptions)
         const getQuestionsObj = await getQuestionsRes.json()
 
-        const results = getQuestionsObj.result.elements.find((o)=>o.QuestionID === params.questionID)
-        console.log('number of questions ', getQuestionsObj.result.elements.length)
-        const qid = results?.QuestionID 
-
-        const firstQuestionData = JSON.stringify({
-            "QuestionText": params.questionText,
-            "DataExportTag": "Q" + (getQuestionsObj.result.elements.length + 1),
-            "QuestionType": "MC",
-            "Selector": "SAHR",
-            "SubSelector": "TX",
-            "Configuration": {
-                "QuestionDescriptionOption": "UseText",
-                "LabelPosition": "BELOW"
-            },
-            "QuestionDescription": params.questionText,
-            "Choices": params.numChoices === "4"?{
-                "1": {
-                    "Display": "Strongly disagree"
-                },
-                "2": {
-                    "Display": "Disagree"
-                },
-                "3": {
-                    "Display": "Agree"
-                },
-                "4": {
-                    "Display": "Strongly agree"
-                }
-            }:params.numChoices === "7"?
-            {
-                "1": {
-                    "Display": "Strongly disagree"
-                },
-                "2": {
-                    "Display": "Disagree"
-                },
-                "3": {
-                    "Display": "Somewhat disagree"
-                },
-                "4": {
-                    "Display": "Neither agree nor disagree"
-                },
-                "5": {
-                    "Display": "Somewhat agree"
-                },
-                "6": {
-                    "Display": "Agree"
-                },
-                "7": {
-                    "Display": "Strongly agree"
-                }
-            }:
-            {
-                "1": {
-                    "Display": "Strongly disagree"
-                },
-                "2": {
-                    "Display": "Disagree"
-                },
-                "3": {
-                    "Display": "Neither agree nor disagree"
-                },
-                "4": {
-                    "Display": "Agree"
-                },
-                "5": {
-                    "Display": "Strongly agree"
-                }
-            },
-            "ChoiceOrder": params.numChoices === "4"?[1,2,3,4]:numChoices === "7"?[1,2,3,4,5,6,7]:[1,2,3,4,5],
-            "Validation": {
-                "Settings": {
-                    "ForceResponse": "OFF",
-                    "ForceResponseType": "ON",
-                    "Type": "None"
-                }
-            },
-            "Language": [],
-            "QuestionID": "QID" + (getQuestionsObj.result.elements.length + 1),
-            "DataVisibility": {
-                "Private": false,
-                "Hidden": false
-            },
-            "DisplayLogic": {
-                "0": {
-                    "0": {
-                        "LogicType": "EmbeddedField",
-                        "LeftOperand": "q" + (getQuestionsObj.result.elements.length + 1),
-                        "Operator": "EqualTo",
-                        "RightOperand": "1",
-                        "Type": "Expression",
-                        "Description": "<span class=\"ConjDesc\">If</span>  <span class=\"LeftOpDesc\">q"+ (getQuestionsObj.result.elements.length + 1) + "</span> <span class=\"OpDesc\">Is Equal to</span> <span class=\"RightOpDesc\"> 1 </span>"
-                    },
-                    "Type": "If"
-                },
-                "Type": "BooleanExpression",
-                "inPage": false
-            },
-            "QuestionText_Unsafe": params.questionText
+        const questionMap = {}
+        getQuestionsObj.result.elements.forEach((e)=>{
+            questionMap[e.DataExportTag] = e
         })
-        
 
-        const updateRequestOptions = {
-            method: 'PUT',
-            headers: props.myHeaders,
-            body: firstQuestionData,
-            redirect: 'follow'
+        console.log('number of questions ', getQuestionsObj.result.elements.length, questionMap)
+
+        let QID = questionMap[params.questionID]?.QuestionID
+        let QID_why = questionMap[params.questionID+"_why"]?.QuestionID
+
+        console.log(QID?`Question ${params.questionID} exists with QID ${QID}`:`Question ${params.questionID} doesn't exist`)
+        console.log(QID_why?`Text Question for ${params.questionID} exists with QID_why ${QID_why}`:`Text Question for ${params.questionID} doesn't exist`)
+
+        if(QID) { // update question
+            let questionData = getRatingQuestionData(params.questionID,QID,params.numChoices,params.questionText)
+            updateQuestion(props.surveyID,questionData)
+        } else { // create question
+            const qid_offset = 2 // QID's start at 2 after the placeholder question is deleted and trash emptied
+
+            QID = "QID" + (Object.keys(questionMap).length + qid_offset)
+            let questionData = getRatingQuestionData(params.questionID,QID,params.numChoices,params.questionText)
+            await createQuestion(props.surveyID,questionData)
+
+            QID_why = "QID" + (Object.keys(questionMap).length + qid_offset+1) // why is always the next QID
+            let textQuestionData = getTextEntryQuestionData(params.questionID,QID_why,QID,params.numChoices)
+            await createQuestion(props.surveyID,textQuestionData)
         }
 
-        if(qid === undefined){
-            createQuestion(surveyID,firstQuestionData, getQuestionsObj.result.elements.length)
-        }
-        else{
-            await fetch(`https://iad1.qualtrics.com/API/v3/survey-definitions/${surveyID}/questions/${qid}`, updateRequestOptions)
-            console.log('question updated')
-        }
     }
 
     return (
