@@ -6,7 +6,8 @@ const ExportData = (props) => {
 
         //starting the response export
         const startExportData = JSON.stringify({
-            "format": "json"
+            "format": "json",
+            "compress" : false
         })
 
         const startExportRequestOptions = {
