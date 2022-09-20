@@ -23,13 +23,13 @@ const CreateQuestions = (props)=> {
        
     },[props.myHeaders, props.surveyID]);
 
-    const createQuestion =  async (surveyID, firstQuestionData) =>{
+    const createQuestion =  async (surveyID, firstQuestionData, numQuestions) =>{
 
         const secondQuestionData = JSON.stringify({
             "QuestionText": "Please Explain why&nbsp;",
             "DefaultChoices": false,
-            "DataExportTag": "Q5",
-            "QuestionID": "QID5",
+            "DataExportTag": "Q" + (numQuestions + 2),
+            "QuestionID": "QID" + (numQuestions + 2),
             "QuestionType": "TE",
             "Selector": "SL",
             "Configuration": {
@@ -44,8 +44,6 @@ const CreateQuestions = (props)=> {
             },
             "GradingData": [],
             "Language": [],
-            "NextChoiceId": 4,
-            "NextAnswerId": 1,
             "SearchSource": {
                 "AllowFreeResponse": "false"
             },
@@ -53,23 +51,23 @@ const CreateQuestions = (props)=> {
                 "0": {
                     "0": {
                         "LogicType": "Question",
-                        "QuestionID": "QID4",
+                        "QuestionID": "QID" + (numQuestions + 1),
                         "QuestionIsInLoop": "no",
-                        "ChoiceLocator": "q://QID4/SelectableChoice/1",
+                        "ChoiceLocator": `q://QID${ (numQuestions + 1)}/SelectableChoice/1`,
                         "Operator": "Selected",
-                        "QuestionIDFromLocator": "QID4",
-                        "LeftOperand": "q://QID4/SelectableChoice/1",
+                        "QuestionIDFromLocator": "QID" + (numQuestions + 1),
+                        "LeftOperand": `q://QID${ (numQuestions + 1)}/SelectableChoice/1`,
                         "Type": "Expression",
                         "Description": "<span class=\"ConjDesc\">If</span> <span class=\"QuestionDesc\">is this working?</span> <span class=\"LeftOpDesc\">Strongly disagree</span> <span class=\"OpDesc\">Is Selected</span> "
                     },
                     "1": {
                         "LogicType": "Question",
-                        "QuestionID": "QID4",
+                        "QuestionID": "QID" + (numQuestions + 1),
                         "QuestionIsInLoop": "no",
-                        "ChoiceLocator": "q://QID4/SelectableChoice/5",
+                        "ChoiceLocator": `q://QID${ (numQuestions + 1)}/SelectableChoice/5`,
                         "Operator": "Selected",
-                        "QuestionIDFromLocator": "QID4",
-                        "LeftOperand": "q://QID4/SelectableChoice/5",
+                        "QuestionIDFromLocator": "QID" + (numQuestions + 1),
+                        "LeftOperand": `q://QID${ (numQuestions + 1)}/SelectableChoice/5`,
                         "Type": "Expression",
                         "Description": "<span class=\"ConjDesc\">Or</span> <span class=\"QuestionDesc\">is this working?</span> <span class=\"LeftOpDesc\">Strongly agree</span> <span class=\"OpDesc\">Is Selected</span> ",
                         "Conjuction": "Or"
@@ -132,7 +130,44 @@ const CreateQuestions = (props)=> {
                 "LabelPosition": "BELOW"
             },
             "QuestionDescription": params.questionText,
-            "Choices": {
+            "Choices": params.numChoices === "4"?{
+                "1": {
+                    "Display": "Strongly disagree"
+                },
+                "2": {
+                    "Display": "Disagree"
+                },
+                "3": {
+                    "Display": "Agree"
+                },
+                "4": {
+                    "Display": "Strongly agree"
+                }
+            }:params.numChoices === "7"?
+            {
+                "1": {
+                    "Display": "Strongly disagree"
+                },
+                "2": {
+                    "Display": "Disagree"
+                },
+                "3": {
+                    "Display": "Somewhat disagree"
+                },
+                "4": {
+                    "Display": "Neither agree nor disagree"
+                },
+                "5": {
+                    "Display": "Somewhat agree"
+                },
+                "6": {
+                    "Display": "Agree"
+                },
+                "7": {
+                    "Display": "Strongly agree"
+                }
+            }:
+            {
                 "1": {
                     "Display": "Strongly disagree"
                 },
@@ -149,13 +184,7 @@ const CreateQuestions = (props)=> {
                     "Display": "Strongly agree"
                 }
             },
-            "ChoiceOrder": [
-                1,
-                2,
-                3,
-                4,
-                5
-            ],
+            "ChoiceOrder": params.numChoices === "4"?[1,2,3,4]:numChoices === "7"?[1,2,3,4,5,6,7]:[1,2,3,4,5],
             "Validation": {
                 "Settings": {
                     "ForceResponse": "OFF",
@@ -164,9 +193,7 @@ const CreateQuestions = (props)=> {
                 }
             },
             "Language": [],
-            "NextChoiceId": 6,
-            "NextAnswerId": 1,
-            "QuestionID": params.questionID,
+            "QuestionID": "QID" + (getQuestionsObj.result.elements.length + 1),
             "DataVisibility": {
                 "Private": false,
                 "Hidden": false
@@ -198,7 +225,7 @@ const CreateQuestions = (props)=> {
         }
 
         if(qid === undefined){
-            createQuestion(surveyID,firstQuestionData)
+            createQuestion(surveyID,firstQuestionData, getQuestionsObj.result.elements.length)
         }
         else{
             await fetch(`https://iad1.qualtrics.com/API/v3/survey-definitions/${surveyID}/questions/${qid}`, updateRequestOptions)
@@ -214,7 +241,7 @@ const CreateQuestions = (props)=> {
             <textarea value={questionID} onChange={(e)=>{setQuestionID(e.target.value)}}/>
             <label>Number of Choices</label>
             <textarea value={numChoices} onChange={(e)=>{setNumChoices(e.target.value)}}/>
-            <button onClick={()=>{addQuestion({questionText,questionID})}} className='Button'>
+            <button onClick={()=>{addQuestion({ questionText,questionID, numChoices })}} className='Button'>
                 Click to add questions
             </button>
         </>

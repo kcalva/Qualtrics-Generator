@@ -4,7 +4,7 @@ import SendUser from './Components/SendUser'
 import ExportData from './Components/ExportData'
 
 const X_API_TOKEN = "S6Vip4gGnK5e42fPs6qHPLN1Qy3LCMi7MkFcZUKy"
-const SURVEY_ID = "SV_bfruEir8oft3iWa"
+const SURVEY_ID = "SV_0jJX9soJneLrmKy"
 const DEFAULT_DIRECTORY = "POOL_28S50Seuo8J1WU8"
 const MAILINGLIST_ID = "CG_1IinPnnXNsd3fxT"
 
@@ -21,7 +21,7 @@ const App = () => {
         <ExportData myHeaders={myHeaders} surveyID={SURVEY_ID}/>
       </header>
     </div>
-  );
+  )
 }
 
-export default App;
+export default App
