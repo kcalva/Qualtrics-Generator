@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
+import { ids, headers } from '../constants'
 
-const SendUser = (props) => {
+const SendUser = () => {
 
     const [firstName, setFirstName] = useState('')
     const [lastName, setLastName] = useState('')
@@ -17,7 +18,7 @@ const SendUser = (props) => {
     //ADD Here
     const sendUser = async (params) => {
     
-        const  mailingListId = props.mailingListID
+        const  mailingListId = ids.MAILINGLIST_ID
     
         const addContactData = JSON.stringify({
             "firstName": params.firstName,
@@ -30,12 +31,12 @@ const SendUser = (props) => {
     
         const addContactRequestOptions = {
           method: 'POST',
-          headers: props.myHeaders,
+          headers,
           body: addContactData,
           redirect: 'follow'
         }
     
-        const addContactRes = await fetch(`https://iad1.qualtrics.com/API/v3/directories/${props.directory}/mailinglists/${mailingListId}/contacts`, addContactRequestOptions)
+        const addContactRes = await fetch(`https://iad1.qualtrics.com/API/v3/directories/${ids.DEFAULT_DIRECTORY}/mailinglists/${mailingListId}/contacts`, addContactRequestOptions)
         const addContactObj = await addContactRes.json()
         console.log('adding contacts to mailing list obj ',addContactObj)
     
@@ -59,7 +60,7 @@ const SendUser = (props) => {
             "subject": params.subject
           },
           "surveyLink": {
-            "surveyId": props.surveyID,
+            "surveyId": ids.SURVEY_ID,
             "type": "Individual"
           },
           "sendDate": today.toISOString()
@@ -67,7 +68,7 @@ const SendUser = (props) => {
     
         const sendToUserRequestOptions = {
           method: 'POST',
-          headers: props.myHeaders,
+          headers,
           body: sendToUserData,
           redirect: 'follow'
         }

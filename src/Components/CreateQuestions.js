@@ -1,28 +1,28 @@
 import React, { useState, useEffect } from 'react'
+import { ids, headers } from '../constants'
 
-const CreateQuestions = (props)=> {
+const CreateQuestions = ()=> {
     const [questionText, setQuestionText] = useState('')
     const [questionID, setQuestionID] = useState('')
     const [numChoices, setNumChoices] = useState()
 
-    useEffect(() => {
+    // useEffect(() => {
     
-        const surveyMetaData = JSON.stringify({
-            "SurveyStatus": "Active",
-        })
+    //     const surveyMetaData = JSON.stringify({
+    //         "SurveyStatus": "Active",
+    //     })
         
-        const updateMetaDataRequestOptions = {
-            method: 'PUT',
-            headers: props.myHeaders,
-            body: surveyMetaData,
-            redirect: 'follow'
-        }
+    //     const updateMetaDataRequestOptions = {
+    //         method: 'PUT',
+    //         headers,
+    //         body: surveyMetaData,
+    //         redirect: 'follow'
+    //     }
         
-        //Update metadata for Survey to set its status to active
-        fetch(`https://iad1.qualtrics.com/API/v3/survey-definitions/${props.surveyID}/metadata`, updateMetaDataRequestOptions)
+    //     //Update metadata for Survey to set its status to active
+    //     fetch(`https://iad1.qualtrics.com/API/v3/survey-definitions/${ids.SURVEY_ID}/metadata`, updateMetaDataRequestOptions)
        
-    },[props.myHeaders, props.surveyID]);
-
+    // },[])
 
     const publishSurvey = () => {
         const surveyMetaData = JSON.stringify({
@@ -31,13 +31,14 @@ const CreateQuestions = (props)=> {
         
         const updateMetaDataRequestOptions = {
             method: 'PUT',
-            headers: props.myHeaders,
+            headers,
             body: surveyMetaData,
             redirect: 'follow'
         }
+        console.log('publishingSurvey')
         
         //Update metadata for Survey to set its status to active
-        fetch(`https://iad1.qualtrics.com/API/v3/survey-definitions/${props.surveyID}/metadata`, updateMetaDataRequestOptions)
+        fetch(`https://iad1.qualtrics.com/API/v3/survey-definitions/${ids.SURVEY_ID}/metadata`, updateMetaDataRequestOptions)
     }
 
 
@@ -187,7 +188,7 @@ const CreateQuestions = (props)=> {
     const createQuestion = async (surveyID, questionObject) => {
         const options = {
             method: 'POST',
-            headers: props.myHeaders,
+            headers: headers,
             body: questionObject,
             redirect: 'follow'
         }
@@ -198,7 +199,7 @@ const CreateQuestions = (props)=> {
     const updateQuestion = async (surveyID, questionObject) => {
         const options = {
             method: 'PUT',
-            headers: props.myHeaders,
+            headers: headers,
             body: questionObject,
             redirect: 'follow'
         }
@@ -219,11 +220,11 @@ const CreateQuestions = (props)=> {
 
     const addQuestion = async (params) => { 
 
-        const surveyID = props.surveyID  
+        const surveyID = ids.SURVEY_ID 
 
         const getQuestionsDataRequestOptions = {
             method: 'GET',
-            headers: props.myHeaders,
+            headers: headers,
             redirect: 'follow'
         }
 
@@ -246,19 +247,19 @@ const CreateQuestions = (props)=> {
 
         if(QID) { // update question
             let questionData = getRatingQuestionData(params.questionID,QID,params.numChoices,params.questionText)
-            updateQuestion(props.surveyID,questionData)
+            await updateQuestion(surveyID,questionData)
         } else { // create question
             const qid_offset = 2 // QID's start at 2 after the placeholder question is deleted and trash emptied
 
             QID = "QID" + (Object.keys(questionMap).length + qid_offset)
             let questionData = getRatingQuestionData(params.questionID,QID,params.numChoices,params.questionText)
-            await createQuestion(props.surveyID,questionData)
+            await createQuestion(surveyID,questionData)
 
             QID_why = "QID" + (Object.keys(questionMap).length + qid_offset+1) // why is always the next QID
             let textQuestionData = getTextEntryQuestionData(params.questionID,QID_why,QID,params.numChoices)
-            await createQuestion(props.surveyID,textQuestionData)
+            await createQuestion(surveyID,textQuestionData)
         }
-
+        await publishSurvey()
     }
 
     return (
