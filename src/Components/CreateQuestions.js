@@ -1,28 +1,10 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import { ids, headers } from '../constants'
 
 const CreateQuestions = ()=> {
     const [questionText, setQuestionText] = useState('')
     const [questionID, setQuestionID] = useState('')
     const [numChoices, setNumChoices] = useState()
-
-    // useEffect(() => {
-    
-    //     const surveyMetaData = JSON.stringify({
-    //         "SurveyStatus": "Active",
-    //     })
-        
-    //     const updateMetaDataRequestOptions = {
-    //         method: 'PUT',
-    //         headers,
-    //         body: surveyMetaData,
-    //         redirect: 'follow'
-    //     }
-        
-    //     //Update metadata for Survey to set its status to active
-    //     fetch(`https://iad1.qualtrics.com/API/v3/survey-definitions/${ids.SURVEY_ID}/metadata`, updateMetaDataRequestOptions)
-       
-    // },[])
 
     const publishSurvey = () => {
         const surveyMetaData = JSON.stringify({
@@ -132,7 +114,7 @@ const CreateQuestions = ()=> {
             "DataExportTag": questionTag + "_why",
             "QuestionID": QID,
 
-            "DisplayLogic": {
+            "InPageDisplayLogic": {
                 "0": {
                     "0": {
                         "LogicType": "Question",
@@ -148,17 +130,17 @@ const CreateQuestions = ()=> {
                         "LogicType": "Question",
                         "QuestionID": refQID,
                         "QuestionIsInLoop": "no",
-                        "ChoiceLocator": `q://${refQID}/SelectableChoice/${numChoices}`,
+                        "ChoiceLocator": `q://${refQID}/SelectableChoice/${numChoices !==4 || 7 ? 5:numChoices}`,
                         "Operator": "Selected",
                         "QuestionIDFromLocator": `${refQID}`,
-                        "LeftOperand": `q://${refQID}/SelectableChoice/${numChoices}`,
+                        "LeftOperand": `q://${refQID}/SelectableChoice/${numChoices !==4 || 7 ? 5:numChoices}`,
                         "Type": "Expression",
                         "Conjuction": "Or"
                     },
                     "Type": "If"
                 },
                 "Type": "BooleanExpression",
-                "inPage": false
+                "inPage": true
             },
             "DefaultChoices": false,
             "QuestionType": "TE",
