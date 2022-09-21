@@ -123,10 +123,10 @@ const getTextEntryQuestionData = (questionTag,QID,refQID,numChoices,questionText
                     "LogicType": "Question",
                     "QuestionID": refQID,
                     "QuestionIsInLoop": "no",
-                    "ChoiceLocator": `q://${refQID}/SelectableChoice/${numChoices !==4 || 7 ? 5:numChoices}`,
+                    "ChoiceLocator": `q://${refQID}/SelectableChoice/${numChoices}`,
                     "Operator": "Selected",
                     "QuestionIDFromLocator": `${refQID}`,
-                    "LeftOperand": `q://${refQID}/SelectableChoice/${numChoices !==4 || 7 ? 5:numChoices}`,
+                    "LeftOperand": `q://${refQID}/SelectableChoice/${numChoices}`,
                     "Type": "Expression",
                     "Conjuction": "Or"
                 },
@@ -179,7 +179,7 @@ const updateQuestion = async (surveyID, questionObject) => {
         redirect: 'follow'
     }
 
-    await fetch(`https://iad1.qualtrics.com/API/v3/survey-definitions/${surveyID}/questions/${questionObject.QuestionID}`, options)
+    await fetch(`https://iad1.qualtrics.com/API/v3/survey-definitions/${surveyID}/questions/${JSON.parse(questionObject).QuestionID}`, options)
     console.log('question updated')
 }
 
