@@ -9,14 +9,14 @@ const CreateQuestions = ()=> {
 
     return (
         <>
-            <label>Question Text</label>
+            <label>questionText</label>
             <textarea value={questionText} onChange={(e)=>{setQuestionText(e.target.value)}}/>
-            <label>Question ID (ex. QID#)</label>
+            <label>questionID</label>
             <textarea value={questionID} onChange={(e)=>{setQuestionID(e.target.value)}}/>
-            <label>Number of Choices</label>
+            <label>numChoices</label>
             <textarea value={numChoices} onChange={(e)=>{setNumChoices(e.target.value)}}/>
             <button onClick={()=>{addQuestion({ questionText,questionID, numChoices })}} className='Button'>
-                Click to add questions
+               addQuestion
             </button>
         </>
     )

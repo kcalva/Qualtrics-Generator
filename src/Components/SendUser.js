@@ -20,32 +20,32 @@ const SendUser = () => {
         <>
             <div className='SendUser-Container'>
                 <div style={{display:"flex", flexDirection: "column"}}>
-                    <label>First Name</label>
+                    <label>firstName</label>
                     <textarea value={firstName} onChange={(e)=>{setFirstName(e.target.value)}}/>
-                    <label>Last Name</label>
+                    <label>lastName</label>
                     <textarea value={lastName} onChange={(e)=>{setLastName(e.target.value)}}/>
-                    <label>Email</label>
+                    <label>email</label>
                     <textarea value={email} onChange={(e)=>{setEmail(e.target.value)}}/>
-                    <label>External Reference</label>
+                    <label>extRef</label>
                     <textarea value={extRef} onChange={(e)=>{setExtRef(e.target.value)}}/>
-                    <label>Embedded Data <br/>(must be in JSON form ex. {`{ showQ1 : "true" }`})</label>
+                    <label>embeddedData</label>
                     <textarea value={embeddedData} onChange={(e)=>{setEmbeddedData(e.target.value)}}/>
                 </div>
                 <div style={{display:"flex", flexDirection: "column"}}>
-                    <label>Link MetaData</label>
+                    <label>linkMetaData</label>
                     <textarea value={linkMetaData} onChange={(e)=>{setLinkMetaData(e.target.value)}}/>
-                    <label>From Email</label>
+                    <label>fromEmail</label>
                     <textarea value={fromEmail} onChange={(e)=>{setFromEmail(e.target.value)}}/>
-                    <label>Reply To Email</label>
+                    <label>replyToEmail</label>
                     <textarea value={replyToEmail} onChange={(e)=>{setReplyToEmail(e.target.value)}}/>
-                    <label>From</label>
+                    <label>fromName</label>
                     <textarea value={fromName} onChange={(e)=>{setFromName(e.target.value)}}/>
-                    <label>Subject</label>
+                    <label>subject</label>
                     <textarea value={subject} onChange={(e)=>{setSubject(e.target.value)}}/>
                 </div>
             </div>
             <button onClick={()=>{sendUser({ firstName, lastName, email, extRef, embeddedData, linkMetaData, fromEmail, replyToEmail,fromName, subject })}} className='Button'>
-                Click to send to user!
+                sendUser
             </button>
         </>  
     )

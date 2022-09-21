@@ -49,7 +49,7 @@ const ExportData = () => {
     return (
         <>
             <button onClick={()=>{exportingData()}} className='Button'>
-                Click to Export Data
+                exportingData
             </button>
         </>
     )
