@@ -1,8 +1,8 @@
 export const ids = {
-    X_API_TOKEN: "S6Vip4gGnK5e42fPs6qHPLN1Qy3LCMi7MkFcZUKy",
-    SURVEY_ID: "SV_1Tce8uiS6q4MrQO",
+    X_API_TOKEN: "0MIPFjm0PstWCJgxjqoTiYUZFXqm9Q9f5M73Gqc5", 
+    SURVEY_ID: "SV_dbWCSyQMOM1wOoe",
     DEFAULT_DIRECTORY: "POOL_28S50Seuo8J1WU8",
-    MAILINGLIST_ID: "CG_1IinPnnXNsd3fxT"
+    MAILINGLIST_ID: "CG_1Ejlnzn0SOrUNLQ"
 }
 
 export let headers = new Headers()

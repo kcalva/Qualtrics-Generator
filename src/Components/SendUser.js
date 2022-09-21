@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { ids, headers } from '../constants'
+import { sendUser } from '../API/qualtricsAPI'
 
 const SendUser = () => {
 
@@ -15,68 +15,7 @@ const SendUser = () => {
     const [fromName, setFromName] = useState('')
     const [subject, setSubject] = useState('')
 
-    //ADD Here
-    const sendUser = async (params) => {
-    
-        const  mailingListId = ids.MAILINGLIST_ID
-    
-        const addContactData = JSON.stringify({
-            "firstName": params.firstName,
-            "lastName": params.lastName,
-            "email": params.email,
-            "extRef": params.extRef,
-            "embeddedData": JSON.parse(params.embeddedData),
-            "language": "en",
-        })
-    
-        const addContactRequestOptions = {
-          method: 'POST',
-          headers,
-          body: addContactData,
-          redirect: 'follow'
-        }
-    
-        const addContactRes = await fetch(`https://iad1.qualtrics.com/API/v3/directories/${ids.DEFAULT_DIRECTORY}/mailinglists/${mailingListId}/contacts`, addContactRequestOptions)
-        const addContactObj = await addContactRes.json()
-        console.log('adding contacts to mailing list obj ',addContactObj)
-    
-        const linkWrapper = "<a href=${l://SurveyURL}&" + params.linkMetaData.split(",").join("=1&") + "=1>Click Here for Survey</a>"
-    
-        const timeElapsed = Date.now()
-        const today = new Date(timeElapsed)
-    
-        const sendToUserData = JSON.stringify({
-          "message": {
-            "messageText": linkWrapper
-          },
-          "recipients": {
-            "mailingListId": mailingListId,
-            "contactId": addContactObj.result.contactLookupId     
-          },
-          "header": {
-            "fromEmail": params.fromEmail,
-            "replyToEmail": params.replyToEmail,
-            "fromName": params.fromName,
-            "subject": params.subject
-          },
-          "surveyLink": {
-            "surveyId": ids.SURVEY_ID,
-            "type": "Individual"
-          },
-          "sendDate": today.toISOString()
-        })
-    
-        const sendToUserRequestOptions = {
-          method: 'POST',
-          headers,
-          body: sendToUserData,
-          redirect: 'follow'
-        }
-    
-        await fetch("https://iad1.qualtrics.com/API/v3/distributions", sendToUserRequestOptions)
-    
-        console.log('sent to user')
-      }
+
     return (
         <>
             <div className='SendUser-Container'>

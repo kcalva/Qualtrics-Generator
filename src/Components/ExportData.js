@@ -1,5 +1,5 @@
 import React from 'react'
-import { ids, headers } from '../constants'
+import { ids, headers } from '../API/constants'
 
 const ExportData = () => {
     
