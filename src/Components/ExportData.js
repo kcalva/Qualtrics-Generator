@@ -43,16 +43,11 @@ const ExportData = () => {
       
         let getExportProgressRes = await fetch(`https://iad1.qualtrics.com/API/v3/surveys/${ids.SURVEY_ID}/export-responses/${startExportObj.result.progressId}`, getExportProgressRequestOptions)
         let getExportProgressObj = await getExportProgressRes.json()
-        console.log("Progress")
-        console.log(getExportProgressObj)
         if(getExportProgressObj.result.status != "complete") {
-            // TODO: await a couple seconds
+            console.log(`Progress ${getExportProgressObj.result.percentComplete}%`)
             getExportProgressRes = await fetch(`https://iad1.qualtrics.com/API/v3/surveys/${ids.SURVEY_ID}/export-responses/${startExportObj.result.progressId}`, getExportProgressRequestOptions)
             getExportProgressObj = await getExportProgressRes.json()
-            console.log("Progress")
-            console.log(getExportProgressObj)
         }
-
 
         //Get the export file
         const getExportFileRequestOptions = {
@@ -62,7 +57,6 @@ const ExportData = () => {
         }      
         const getExportFileRes = await fetch(`https://iad1.qualtrics.com/API/v3/surveys/${ids.SURVEY_ID}/export-responses/${getExportProgressObj.result.fileId}/file`, getExportFileRequestOptions)
         const getExportFileObj = await getExportFileRes.json()
-        console.log('export file obj ', getExportFileObj)
 
         // Transform file
         let results = []
@@ -104,6 +98,7 @@ const ExportData = () => {
         })
 
         console.log("Transformed data",results)
+        return results
     }
 
     return (
