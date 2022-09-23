@@ -92,7 +92,8 @@ const ExportData = () => {
                         row.items[sfid].label = questionMap[qid].Choices[values[key]].Display
                     }
                 } else {
-                    let metaList = ["externalDataReference","recipientEmail","recipientFirstName","recipientLastName","recordedDate","responseId"]
+                    let metaList = ["externalDataReference","recipientEmail","recipientFirstName","recipientLastName","recordedDate","responseId",
+                            "revieweeID","revieweeFirstName","revieweeLastName"]
                     if(metaList.includes(key)) {
                         row[key] = values[key]
                     }
