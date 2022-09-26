@@ -18,8 +18,6 @@ const publishSurvey = () => {
 
 const getRatingQuestionData = (questionTag,qID,numChoices,questionText) => {
 
-    console.log(`Getting rating question data for ${questionTag} with ${numChoices} choices and text: ${questionText}`)
-
     const questionJson = JSON.stringify({
         "QuestionText": questionText,
         "QuestionDescription": questionText,
@@ -96,8 +94,6 @@ const getRatingQuestionData = (questionTag,qID,numChoices,questionText) => {
 }
 
 const getTextEntryQuestionData = (questionTag,QID,refQID,numChoices,questionText="Please explain why.") => {
-
-    console.log(`Getting text entry question data for ${QID} with ${numChoices} choices and text: ${questionText}`)
 
     const questionJson = JSON.stringify({
         "QuestionText": questionText,
@@ -179,7 +175,6 @@ const updateQuestion = async (surveyID, questionObject) => {
     }
 
     await fetch(`https://iad1.qualtrics.com/API/v3/survey-definitions/${surveyID}/questions/${JSON.parse(questionObject).QuestionID}`, options)
-    console.log('question updated')
 }
 
 
@@ -206,18 +201,8 @@ export const addQuestion = async (params) => {
         questionMap[e.DataExportTag] = e
     })
 
-    console.log('number of questions ', getQuestionsObj.result.elements.length, questionMap)
-
     let QID = questionMap[questionID]?.QuestionID
     let QID_why = questionMap[questionID+"_why"]?.QuestionID
-
-    console.log(QID?`Question ${questionID} exists with QID ${QID}`:`Question ${questionID} doesn't exist`)
-    console.log(QID_why?`Text Question for ${questionID} exists with QID_why ${QID_why}`:`Text Question for ${questionID} doesn't exist`)
-
-
-    const updateQuestion = () => {
-        
-    }
 
     if(QID) { // update question
         let questionData = getRatingQuestionData(questionID,QID,numChoices,questionText)
@@ -280,7 +265,6 @@ export const sendToUser = async (params) => {
 
     const addContactRes = await fetch(`https://iad1.qualtrics.com/API/v3/directories/${ids.DEFAULT_DIRECTORY}/mailinglists/${mailingListId}/contacts`, addContactRequestOptions)
     const addContactObj = await addContactRes.json()
-    console.log('adding contacts to mailing list obj ',addContactObj)
 
     const linkWrapper = "<a href=${l://SurveyURL}&sf" + itemsList.split(",").join("=1&sf") + "=1&revieweeFirstName=" + revieweeFirstName + "&revieweeLastName=" + revieweeLastName + "&revieweeID=" + revieweeID + ">Click Here for Survey</a>"
 
@@ -316,8 +300,6 @@ export const sendToUser = async (params) => {
     }
 
     await fetch("https://iad1.qualtrics.com/API/v3/distributions", sendToUserRequestOptions)
-
-    console.log('sent to user')
   }
 
 
@@ -339,7 +321,6 @@ export const sendToUser = async (params) => {
     getQuestionsObj.result.elements.forEach((e)=>{
         questionMap[e.QuestionID] = e
     })
-    console.log(questionMap)
 
     // starting the response export
     const startExportData = JSON.stringify({
@@ -366,7 +347,6 @@ export const sendToUser = async (params) => {
     let getExportProgressRes = await fetch(`https://iad1.qualtrics.com/API/v3/surveys/${ids.SURVEY_ID}/export-responses/${startExportObj.result.progressId}`, getExportProgressRequestOptions)
     let getExportProgressObj = await getExportProgressRes.json()
     if(getExportProgressObj.result.status != "complete") {
-        console.log(`Progress ${getExportProgressObj.result.percentComplete}%`)
         getExportProgressRes = await fetch(`https://iad1.qualtrics.com/API/v3/surveys/${ids.SURVEY_ID}/export-responses/${startExportObj.result.progressId}`, getExportProgressRequestOptions)
         getExportProgressObj = await getExportProgressRes.json()
     }
@@ -383,9 +363,7 @@ export const sendToUser = async (params) => {
     // Transform file
     let results = []
     getExportFileObj.responses.forEach((response)=>{
-        console.log(response)
         if(response.values.finished!=1) {
-            console.log("ignoring")
             return // ignore unfinished respones
         }
 
@@ -419,6 +397,5 @@ export const sendToUser = async (params) => {
         results.push(row)
     })
 
-    console.log("Transformed data",results)
     return results
 }
