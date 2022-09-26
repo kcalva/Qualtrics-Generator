@@ -230,12 +230,12 @@ export const sendToUser = async (params) => {
     const {
         reviewerFirstName,
         reviewerLastName,
-        reviewerEamil,
+        reviewerEmail,
         reviewerID,
         revieweeFirstName,
         revieweeLastName,
         revieweeID,
-        itemsList,
+        itemList,
         emailFromAddress,
         emailFromName,
         emailSubject,
@@ -246,7 +246,7 @@ export const sendToUser = async (params) => {
     const addContactData = JSON.stringify({
         "firstName": reviewerFirstName,
         "lastName": reviewerLastName,
-        "email": reviewerEamil,
+        "email": reviewerEmail,
         "extRef": reviewerID,
         "embeddedData":{
             "revieweeFirstName": revieweeFirstName,
@@ -266,7 +266,7 @@ export const sendToUser = async (params) => {
     const addContactRes = await fetch(`https://iad1.qualtrics.com/API/v3/directories/${ids.DEFAULT_DIRECTORY}/mailinglists/${mailingListId}/contacts`, addContactRequestOptions)
     const addContactObj = await addContactRes.json()
 
-    const linkWrapper = "<a href=${l://SurveyURL}&sf" + itemsList.split(",").join("=1&sf") + "=1&revieweeFirstName=" + revieweeFirstName + "&revieweeLastName=" + revieweeLastName + "&revieweeID=" + revieweeID + ">Click Here for Survey</a>"
+    const linkWrapper = "<a href=${l://SurveyURL}&sf" + itemList.split(",").join("=1&sf") + "=1&revieweeFirstName=" + revieweeFirstName + "&revieweeLastName=" + revieweeLastName + "&revieweeID=" + revieweeID + ">Click Here for Survey</a>"
 
     const timeElapsed = Date.now()
     const today = new Date(timeElapsed)
