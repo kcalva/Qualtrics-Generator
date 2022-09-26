@@ -11,7 +11,6 @@ const publishSurvey = () => {
         body: surveyMetaData,
         redirect: 'follow'
     }
-    console.log('publishingSurvey')
     
     //Update metadata for Survey to set its status to active
     fetch(`https://iad1.qualtrics.com/API/v3/survey-definitions/${ids.SURVEY_ID}/metadata`, updateMetaDataRequestOptions)
@@ -183,7 +182,12 @@ const updateQuestion = async (surveyID, questionObject) => {
     console.log('question updated')
 }
 
+
+
+
+
 export const addQuestion = async (params) => { 
+    const {questionText, questionID, numChoices, expainQuestionText } = params
 
     const surveyID = ids.SURVEY_ID 
 
@@ -204,42 +208,65 @@ export const addQuestion = async (params) => {
 
     console.log('number of questions ', getQuestionsObj.result.elements.length, questionMap)
 
-    let QID = questionMap[params.questionID]?.QuestionID
-    let QID_why = questionMap[params.questionID+"_why"]?.QuestionID
+    let QID = questionMap[questionID]?.QuestionID
+    let QID_why = questionMap[questionID+"_why"]?.QuestionID
 
-    console.log(QID?`Question ${params.questionID} exists with QID ${QID}`:`Question ${params.questionID} doesn't exist`)
-    console.log(QID_why?`Text Question for ${params.questionID} exists with QID_why ${QID_why}`:`Text Question for ${params.questionID} doesn't exist`)
+    console.log(QID?`Question ${questionID} exists with QID ${QID}`:`Question ${questionID} doesn't exist`)
+    console.log(QID_why?`Text Question for ${questionID} exists with QID_why ${QID_why}`:`Text Question for ${questionID} doesn't exist`)
+
+
+    const updateQuestion = () => {
+        
+    }
 
     if(QID) { // update question
-        let questionData = getRatingQuestionData(params.questionID,QID,params.numChoices,params.questionText)
+        let questionData = getRatingQuestionData(questionID,QID,numChoices,questionText)
         await updateQuestion(surveyID,questionData)
     } else { // create question
         const qid_offset = 2 // QID's start at 2 after the placeholder question is deleted and trash emptied
 
         QID = "QID" + (Object.keys(questionMap).length + qid_offset)
-        let questionData = getRatingQuestionData(params.questionID,QID,params.numChoices,params.questionText)
+        let questionData = getRatingQuestionData(questionID,QID,numChoices,questionText)
         await createQuestion(surveyID,questionData)
 
-        QID_why = "QID" + (Object.keys(questionMap).length + qid_offset+1) // why is always the next QID
-        let textQuestionData = getTextEntryQuestionData(params.questionID,QID_why,QID,params.numChoices,params.expainQuestionText)
+        QID_why = "QID" + (Object.keys(questionMap).length + qid_offset+1) // the "why" is always the next QID
+        let textQuestionData = getTextEntryQuestionData(questionID,QID_why,QID,numChoices,expainQuestionText)
         await createQuestion(surveyID,textQuestionData)
     }
     await publishSurvey()
 }
 
-export const sendUser = async (params) => {
-    
+
+
+
+
+export const sendToUser = async (params) => {
+
+    const {
+        reviewerFirstName,
+        reviewerLastName,
+        reviewerEamil,
+        reviewerID,
+        revieweeFirstName,
+        revieweeLastName,
+        revieweeID,
+        itemsList,
+        emailFromAddress,
+        emailFromName,
+        emailSubject,
+    } = params
+
     const  mailingListId = ids.MAILINGLIST_ID
 
     const addContactData = JSON.stringify({
-        "firstName": params.firstName,
-        "lastName": params.lastName,
-        "email": params.email,
-        "extRef": params.extRef,
+        "firstName": reviewerFirstName,
+        "lastName": reviewerLastName,
+        "email": reviewerEamil,
+        "extRef": reviewerID,
         "embeddedData":{
-            "revieweeFirstName": params.revieweeFirstName,
-            "revieweeLastName": params.revieweeLastName,
-            "revieweeID": params.revieweeID
+            "revieweeFirstName": revieweeFirstName,
+            "revieweeLastName": revieweeLastName,
+            "revieweeID": revieweeID
         },
         "language": "en",
     })
@@ -255,7 +282,7 @@ export const sendUser = async (params) => {
     const addContactObj = await addContactRes.json()
     console.log('adding contacts to mailing list obj ',addContactObj)
 
-    const linkWrapper = "<a href=${l://SurveyURL}&sf" + params.linkMetaData.split(",").join("=1&sf") + "=1&revieweeFirstName=" + params.revieweeFirstName + "&revieweeLastName=" + params.revieweeLastName + "&revieweeID=" + params.revieweeID + ">Click Here for Survey</a>"
+    const linkWrapper = "<a href=${l://SurveyURL}&sf" + itemsList.split(",").join("=1&sf") + "=1&revieweeFirstName=" + revieweeFirstName + "&revieweeLastName=" + revieweeLastName + "&revieweeID=" + revieweeID + ">Click Here for Survey</a>"
 
     const timeElapsed = Date.now()
     const today = new Date(timeElapsed)
@@ -269,10 +296,10 @@ export const sendUser = async (params) => {
         "contactId": addContactObj.result.contactLookupId     
       },
       "header": {
-        "fromEmail": params.fromEmail,
-        "replyToEmail": params.replyToEmail,
-        "fromName": params.fromName,
-        "subject": params.subject
+        "fromEmail": emailFromAddress,
+        "replyToEmail": emailFromAddress,
+        "fromName": emailFromName,
+        "subject": emailSubject
       },
       "surveyLink": {
         "surveyId": ids.SURVEY_ID,
@@ -292,6 +319,11 @@ export const sendUser = async (params) => {
 
     console.log('sent to user')
   }
+
+
+
+
+
 
   export const exportData = async () =>{
 

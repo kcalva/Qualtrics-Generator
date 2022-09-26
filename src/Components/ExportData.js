@@ -6,7 +6,7 @@ const ExportData = () => {
     return (
         <>
             <button onClick={()=>{exportData()}} className='Button'>
-                exportingData
+                exportData
             </button>
         </>
     )

@@ -1,59 +1,71 @@
 import React, { useState } from 'react'
-import { sendUser } from '../API/qualtricsAPI'
+import { sendToUser } from '../API/qualtricsAPI'
 
 const SendUser = () => {
 
-    const [firstName, setFirstName] = useState('')
-    const [lastName, setLastName] = useState('')
-    const [email, setEmail] = useState('')
-    const [extRef, setExtRef] = useState('')
+    const [reviewerFirstName, setreviewerFirstName] = useState('')
+    const [reviewerLastName, setReviewerLastName] = useState('')
+    const [reviewerEmail, setReviewerEmail] = useState('')
+    const [reviewerID, setReviewerID] = useState('')
     const [revieweeFirstName, setRevieweeFirstName] = useState('')
     const [revieweeLastName, setRevieweeLastName] = useState('')
     const [revieweeID, setRevieweeID] = useState('')
 
-    const [linkMetaData, setLinkMetaData] = useState('')
-    const [fromEmail, setFromEmail] = useState('')
-    const [replyToEmail, setReplyToEmail] = useState('')
-    const [fromName, setFromName] = useState('')
-    const [subject, setSubject] = useState('')
+    const [itemList, setItemList] = useState('')
+    const [emailFromAddress, setEmailFromAddress] = useState('')
+    const [emailFromName, setEmailFromName] = useState('')
+    const [emailSubject, setEmailSubject] = useState('')
 
 
     return (
-        <>
+        <div>
             <div className='SendUser-Container'>
                 <div style={{display:"flex", flexDirection: "column"}}>
-                    <label>firstName</label>
-                    <textarea value={firstName} onChange={(e)=>{setFirstName(e.target.value)}}/>
-                    <label>lastName</label>
-                    <textarea value={lastName} onChange={(e)=>{setLastName(e.target.value)}}/>
-                    <label>email</label>
-                    <textarea value={email} onChange={(e)=>{setEmail(e.target.value)}}/>
-                    <label>extRef</label>
-                    <textarea value={extRef} onChange={(e)=>{setExtRef(e.target.value)}}/>
+                    <label>reviewerID</label>
+                    <textarea value={reviewerID} onChange={(e)=>{setReviewerID(e.target.value)}}/>
+                    <label>reviewerFirstName</label>
+                    <textarea value={reviewerFirstName} onChange={(e)=>{setreviewerFirstName(e.target.value)}}/>
+                    <label>reviewerLastName</label>
+                    <textarea value={reviewerLastName} onChange={(e)=>{setReviewerLastName(e.target.value)}}/>
+                    <label>reviewerEmail</label>
+                    <textarea value={reviewerEmail} onChange={(e)=>{setReviewerEmail(e.target.value)}}/>
+                </div>
+                <div style={{display:"flex", flexDirection: "column"}}>
+                    <label>revieweeID</label>
+                    <textarea value={revieweeID} onChange={(e)=>{setRevieweeID(e.target.value)}}/>
                     <label>revieweeFirstName</label>
                     <textarea value={revieweeFirstName} onChange={(e)=>{setRevieweeFirstName(e.target.value)}}/>
                     <label>revieweeLastName</label>
                     <textarea value={revieweeLastName} onChange={(e)=>{setRevieweeLastName(e.target.value)}}/>
-                    <label>revieweeID</label>
-                    <textarea value={revieweeID} onChange={(e)=>{setRevieweeID(e.target.value)}}/>
                 </div>
                 <div style={{display:"flex", flexDirection: "column"}}>
-                    <label>linkMetaData</label>
-                    <textarea value={linkMetaData} onChange={(e)=>{setLinkMetaData(e.target.value)}}/>
-                    <label>fromEmail</label>
-                    <textarea value={fromEmail} onChange={(e)=>{setFromEmail(e.target.value)}}/>
-                    <label>replyToEmail</label>
-                    <textarea value={replyToEmail} onChange={(e)=>{setReplyToEmail(e.target.value)}}/>
-                    <label>fromName</label>
-                    <textarea value={fromName} onChange={(e)=>{setFromName(e.target.value)}}/>
-                    <label>subject</label>
-                    <textarea value={subject} onChange={(e)=>{setSubject(e.target.value)}}/>
+                    <label>itemList</label>
+                    <textarea value={itemList} onChange={(e)=>{setItemList(e.target.value)}}/>
+                    <label>emailSubject</label>
+                    <textarea value={emailSubject} onChange={(e)=>{setEmailSubject(e.target.value)}}/>
+                    <label>emailFromAddress</label>
+                    <textarea value={emailFromAddress} onChange={(e)=>{setEmailFromAddress(e.target.value)}}/>
+                    <label>emailFromName</label>
+                    <textarea value={emailFromName} onChange={(e)=>{setEmailFromName(e.target.value)}}/>
                 </div>
             </div>
-            <button onClick={()=>{sendUser({ firstName, lastName, email, extRef, revieweeFirstName, revieweeLastName, revieweeID, linkMetaData, fromEmail, replyToEmail,fromName, subject })}} className='Button'>
-                sendUser
-            </button>
-        </>  
+            <button onClick={()=>{sendToUser({ 
+                        reviewerFirstName,
+                        reviewerLastName, 
+                        reviewerEmail,
+                        reviewerID,
+                        revieweeFirstName,
+                        revieweeLastName, 
+                        revieweeID,
+                        itemList,
+                        emailFromAddress, 
+                        emailFromName,
+                        emailSubject,
+                })}} className='Button'>
+                    sendToUser
+                </button>
+
+        </div>  
     )
 }
 
