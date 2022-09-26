@@ -236,7 +236,11 @@ export const sendUser = async (params) => {
         "lastName": params.lastName,
         "email": params.email,
         "extRef": params.extRef,
-        "embeddedData": JSON.parse(params.embeddedData),
+        "embeddedData":{
+            "revieweeFirstName": params.revieweeFirstName,
+            "revieweeLastName": params.revieweeLastName,
+            "revieweeID": params.revieweeID
+        },
         "language": "en",
     })
 
@@ -251,7 +255,7 @@ export const sendUser = async (params) => {
     const addContactObj = await addContactRes.json()
     console.log('adding contacts to mailing list obj ',addContactObj)
 
-    const linkWrapper = "<a href=${l://SurveyURL}&sf" + params.linkMetaData.split(",").join("=1&sf") + "=1>Click Here for Survey</a>"
+    const linkWrapper = "<a href=${l://SurveyURL}&sf" + params.linkMetaData.split(",").join("=1&sf") + "=1&revieweeFirstName=" + params.revieweeFirstName + "&revieweeLastName=" + params.revieweeLastName + "&revieweeID=" + params.revieweeID + ">Click Here for Survey</a>"
 
     const timeElapsed = Date.now()
     const today = new Date(timeElapsed)

@@ -7,7 +7,9 @@ const SendUser = () => {
     const [lastName, setLastName] = useState('')
     const [email, setEmail] = useState('')
     const [extRef, setExtRef] = useState('')
-    const [embeddedData, setEmbeddedData] = useState()
+    const [revieweeFirstName, setRevieweeFirstName] = useState('')
+    const [revieweeLastName, setRevieweeLastName] = useState('')
+    const [revieweeID, setRevieweeID] = useState('')
 
     const [linkMetaData, setLinkMetaData] = useState('')
     const [fromEmail, setFromEmail] = useState('')
@@ -28,8 +30,12 @@ const SendUser = () => {
                     <textarea value={email} onChange={(e)=>{setEmail(e.target.value)}}/>
                     <label>extRef</label>
                     <textarea value={extRef} onChange={(e)=>{setExtRef(e.target.value)}}/>
-                    <label>embeddedData</label>
-                    <textarea value={embeddedData} onChange={(e)=>{setEmbeddedData(e.target.value)}}/>
+                    <label>revieweeFirstName</label>
+                    <textarea value={revieweeFirstName} onChange={(e)=>{setRevieweeFirstName(e.target.value)}}/>
+                    <label>revieweeLastName</label>
+                    <textarea value={revieweeLastName} onChange={(e)=>{setRevieweeLastName(e.target.value)}}/>
+                    <label>revieweeID</label>
+                    <textarea value={revieweeID} onChange={(e)=>{setRevieweeID(e.target.value)}}/>
                 </div>
                 <div style={{display:"flex", flexDirection: "column"}}>
                     <label>linkMetaData</label>
@@ -44,7 +50,7 @@ const SendUser = () => {
                     <textarea value={subject} onChange={(e)=>{setSubject(e.target.value)}}/>
                 </div>
             </div>
-            <button onClick={()=>{sendUser({ firstName, lastName, email, extRef, embeddedData, linkMetaData, fromEmail, replyToEmail,fromName, subject })}} className='Button'>
+            <button onClick={()=>{sendUser({ firstName, lastName, email, extRef, revieweeFirstName, revieweeLastName, revieweeID, linkMetaData, fromEmail, replyToEmail,fromName, subject })}} className='Button'>
                 sendUser
             </button>
         </>  
