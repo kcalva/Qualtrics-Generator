@@ -118,10 +118,10 @@ const getTextEntryQuestionData = (questionTag,QID,refQID,numChoices,questionText
                     "LogicType": "Question",
                     "QuestionID": refQID,
                     "QuestionIsInLoop": "no",
-                    "ChoiceLocator": `q://${refQID}/SelectableChoice/${numChoices}`,
+                    "ChoiceLocator": `q://${refQID}/SelectableChoice/${numChoices === "4" || numChoices === "7" ? numChoices : "5"}`,
                     "Operator": "Selected",
                     "QuestionIDFromLocator": `${refQID}`,
-                    "LeftOperand": `q://${refQID}/SelectableChoice/${numChoices}`,
+                    "LeftOperand": `q://${refQID}/SelectableChoice/${numChoices === "4" || numChoices === "7" ? numChoices : "5"}`,
                     "Type": "Expression",
                     "Conjuction": "Or"
                 },
@@ -207,6 +207,8 @@ export const addQuestion = async (params) => {
     if(QID) { // update question
         let questionData = getRatingQuestionData(questionID,QID,numChoices,questionText)
         await updateQuestion(surveyID,questionData)
+        let textQuestionData = getTextEntryQuestionData(params.questionID,QID_why,QID,params.numChoices,params.expainQuestionText)
+        await updateQuestion(surveyID,textQuestionData)        
     } else { // create question
         const qid_offset = 2 // QID's start at 2 after the placeholder question is deleted and trash emptied
 

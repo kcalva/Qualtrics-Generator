@@ -1,11 +1,11 @@
 export const ids = {
-    X_API_TOKEN: "S6Vip4gGnK5e42fPs6qHPLN1Qy3LCMi7MkFcZUKy",
+    X_API_TOKEN: "",
 
-    SURVEY_ID: "SV_8GMa77xhDaue9zE",
+    SURVEY_ID: "",
 
-    DEFAULT_DIRECTORY: "POOL_28S50Seuo8J1WU8",
+    DEFAULT_DIRECTORY: "",
 
-    MAILINGLIST_ID: "CG_2tiikgnKRw7zUjS"
+    MAILINGLIST_ID: ""
 }
 
 export let headers = new Headers()
