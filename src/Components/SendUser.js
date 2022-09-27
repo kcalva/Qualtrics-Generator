@@ -1,155 +1,71 @@
-import React from 'react'
-import { useState } from 'react'
+import React, { useState } from 'react'
+import { sendToUser } from '../API/qualtricsAPI'
 
-const SendUser = (props) => {
+const SendUser = () => {
 
-    const DEFAULT_DIRECTORY = "POOL_28S50Seuo8J1WU8"
+    const [reviewerFirstName, setreviewerFirstName] = useState('')
+    const [reviewerLastName, setReviewerLastName] = useState('')
+    const [reviewerEmail, setReviewerEmail] = useState('')
+    const [reviewerID, setReviewerID] = useState('')
+    const [revieweeFirstName, setRevieweeFirstName] = useState('')
+    const [revieweeLastName, setRevieweeLastName] = useState('')
+    const [revieweeID, setRevieweeID] = useState('')
 
-    const [mailingListName, setMailingListName] = useState('')
-    const [firstName, setFirstName] = useState('')
-    const [lastName, setLastName] = useState('')
-    const [email, setEmail] = useState('')
-    const [extRef, setExtRef] = useState('')
-    const [embeddedData, setEmbeddedData] = useState()
+    const [itemList, setItemList] = useState('')
+    const [emailFromAddress, setEmailFromAddress] = useState('')
+    const [emailFromName, setEmailFromName] = useState('')
+    const [emailSubject, setEmailSubject] = useState('')
 
-    const [linkText, setLinkText] = useState('')
-    const [linkMetaData, setLinkMetaData] = useState('')
-    const [fromEmail, setFromEmail] = useState('')
-    const [replyToEmail, setReplyToEmail] = useState('')
-    const [fromName, setFromName] = useState('')
-    const [subject, setSubject] = useState()
 
-    let mailingListId
-
-    const createMailingList = async (params) => {
-        const mailingListData = JSON.stringify({
-          "name": params.mailingListName,
-        })
-    
-        const mailingListRequestOptions = {
-          method: 'POST',
-          headers: props.myHeaders,
-          body: mailingListData,
-          redirect: 'follow'
-        }
-    
-        const mailingListRes = await fetch(`https://iad1.qualtrics.com/API/v3/directories/${DEFAULT_DIRECTORY}/mailinglists`, mailingListRequestOptions)
-        const mailingListObj = await mailingListRes.json()
-        mailingListId = mailingListObj.result.id
-    
-        return mailingListId
-    }
-
-    const getMailingListId = async (params) => {
-
-        if(mailingListId === undefined){
-          console.log('mailingListId not found: creating mailingList... ')
-          mailingListId = createMailingList(params)
-        }
-       
-        return mailingListId
-      }
-
-    const sendUser = async (params) => {
-        console.log('surveyID on send User function ', props.surveyID)
-        mailingListId = await getMailingListId(params)
-    
-    
-        const addContactData = JSON.stringify({
-            "firstName": params.firstName,
-            "lastName": params.lastName,
-            "email": params.email,
-            "extRef": params.extRef,
-            "embeddedData": JSON.parse(params.embeddedData),
-            "language": "en",
-        })
-    
-        const addContactRequestOptions = {
-          method: 'POST',
-          headers: props.myHeaders,
-          body: addContactData,
-          redirect: 'follow'
-        }
-    
-        const addContactRes = await fetch(`https://iad1.qualtrics.com/API/v3/directories/${DEFAULT_DIRECTORY}/mailinglists/${mailingListId}/contacts`, addContactRequestOptions)
-        const addContactObj = await addContactRes.json()
-        console.log('adding contacts to mailing list obj ',addContactObj)
-    
-        const linkWrapper = "<a href=${l://SurveyURL}&" + params.linkMetaData +">"+ params.linkText + "</a>"
-    
-        const timeElapsed = Date.now()
-        const today = new Date(timeElapsed)
-    
-        const sendToUserData = JSON.stringify({
-          "message": {
-            "messageText": linkWrapper
-          },
-          "recipients": {
-            "mailingListId": mailingListId,
-            "contactId": addContactObj.result.contactLookupId     
-          },
-          "header": {
-            "fromEmail": params.fromEmail,
-            "replyToEmail": params.replyToEmail,
-            "fromName": params.fromName,
-            "subject": params.subject
-          },
-          "surveyLink": {
-            "surveyId": props.surveyID,
-            "type": "Individual"
-          },
-          "sendDate": today.toISOString()
-        })
-    
-        const sendToUserRequestOptions = {
-          method: 'POST',
-          headers: props.myHeaders,
-          body: sendToUserData,
-          redirect: 'follow'
-        }
-    
-        const sendToUserRes = await fetch("https://iad1.qualtrics.com/API/v3/distributions", sendToUserRequestOptions)
-        const sendToUserObj = await sendToUserRes.json()
-    
-        console.log('sendToUserObj ', sendToUserObj)
-    
-      }
     return (
-        <>
+        <div>
             <div className='SendUser-Container'>
                 <div style={{display:"flex", flexDirection: "column"}}>
-                    <label>MailingList Name</label>
-                    <textarea value={mailingListName} onChange={(e)=>{setMailingListName(e.target.value)}}/>
-                    <label>First Name</label>
-                    <textarea value={firstName} onChange={(e)=>{setFirstName(e.target.value)}}/>
-                    <label>Last Name</label>
-                    <textarea value={lastName} onChange={(e)=>{setLastName(e.target.value)}}/>
-                    <label>Email</label>
-                    <textarea value={email} onChange={(e)=>{setEmail(e.target.value)}}/>
-                    <label>External Reference</label>
-                    <textarea value={extRef} onChange={(e)=>{setExtRef(e.target.value)}}/>
-                    <label>Embedded Data <br/>(must be in JSON form ex. {`{ showQ1 : "true" }`})</label>
-                    <textarea value={embeddedData} onChange={(e)=>{setEmbeddedData(e.target.value)}}/>
+                    <label>reviewerID</label>
+                    <textarea value={reviewerID} onChange={(e)=>{setReviewerID(e.target.value)}}/>
+                    <label>reviewerFirstName</label>
+                    <textarea value={reviewerFirstName} onChange={(e)=>{setreviewerFirstName(e.target.value)}}/>
+                    <label>reviewerLastName</label>
+                    <textarea value={reviewerLastName} onChange={(e)=>{setReviewerLastName(e.target.value)}}/>
+                    <label>reviewerEmail</label>
+                    <textarea value={reviewerEmail} onChange={(e)=>{setReviewerEmail(e.target.value)}}/>
                 </div>
                 <div style={{display:"flex", flexDirection: "column"}}>
-                    <label>Link Description</label>
-                    <textarea value={linkText} onChange={(e)=>{setLinkText(e.target.value)}}/>
-                    <label>Link MetaData</label>
-                    <textarea value={linkMetaData} onChange={(e)=>{setLinkMetaData(e.target.value)}}/>
-                    <label>From Email</label>
-                    <textarea value={fromEmail} onChange={(e)=>{setFromEmail(e.target.value)}}/>
-                    <label>Reply To Email</label>
-                    <textarea value={replyToEmail} onChange={(e)=>{setReplyToEmail(e.target.value)}}/>
-                    <label>From</label>
-                    <textarea value={fromName} onChange={(e)=>{setFromName(e.target.value)}}/>
-                    <label>Subject</label>
-                    <textarea value={subject} onChange={(e)=>{setSubject(e.target.value)}}/>
+                    <label>revieweeID</label>
+                    <textarea value={revieweeID} onChange={(e)=>{setRevieweeID(e.target.value)}}/>
+                    <label>revieweeFirstName</label>
+                    <textarea value={revieweeFirstName} onChange={(e)=>{setRevieweeFirstName(e.target.value)}}/>
+                    <label>revieweeLastName</label>
+                    <textarea value={revieweeLastName} onChange={(e)=>{setRevieweeLastName(e.target.value)}}/>
+                </div>
+                <div style={{display:"flex", flexDirection: "column"}}>
+                    <label>itemList</label>
+                    <textarea value={itemList} onChange={(e)=>{setItemList(e.target.value)}}/>
+                    <label>emailSubject</label>
+                    <textarea value={emailSubject} onChange={(e)=>{setEmailSubject(e.target.value)}}/>
+                    <label>emailFromAddress</label>
+                    <textarea value={emailFromAddress} onChange={(e)=>{setEmailFromAddress(e.target.value)}}/>
+                    <label>emailFromName</label>
+                    <textarea value={emailFromName} onChange={(e)=>{setEmailFromName(e.target.value)}}/>
                 </div>
             </div>
-            <button onClick={()=>{sendUser({ mailingListName,firstName,lastName,email,extRef,embeddedData, linkText, linkMetaData, fromEmail, replyToEmail,fromName, subject })}} className='Button'>
-                Click to send to user!
-            </button>
-        </>  
+            <button onClick={()=>{sendToUser({ 
+                        reviewerFirstName,
+                        reviewerLastName, 
+                        reviewerEmail,
+                        reviewerID,
+                        revieweeFirstName,
+                        revieweeLastName, 
+                        revieweeID,
+                        itemList,
+                        emailFromAddress, 
+                        emailFromName,
+                        emailSubject,
+                })}} className='Button'>
+                    sendToUser
+                </button>
+
+        </div>  
     )
 }
 
