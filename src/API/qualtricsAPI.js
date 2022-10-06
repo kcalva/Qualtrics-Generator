@@ -376,12 +376,18 @@ export const exportData = async () => {
     questionMap[e.QuestionID] = e;
   });
 
-  // starting the response export
-  const startExportData = JSON.stringify({
+  let exportDataObj = {
     format: "json",
     compress: false,
-    // filterId: "4a007746-1f71-40d1-b778-bffcc08b36a0",
-  });
+  };
+
+  const filterID = ids.EXPORT_LAST14; //filter can be changed here
+  if (filterID) {
+    exportDataObj.filterId = filterID;
+  }
+
+  // starting the response export
+  const startExportData = JSON.stringify(exportDataObj);
   const startExportRequestOptions = {
     method: "POST",
     headers,
