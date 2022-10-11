@@ -1,7 +1,13 @@
 import { ids, headers, BASE_URL } from "./constants";
+import axios from "axios";
 
 const restRequest = (url, options) => {
   return fetch(url, options);
+  //   return axios({
+  //     url,
+  //     ...options,
+  //     data: options.body,
+  //   });
 };
 
 const publishSurvey = () => {
