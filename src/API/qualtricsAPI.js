@@ -1,5 +1,9 @@
 import { ids, headers, BASE_URL } from "./constants";
 
+const restRequest = (url, options) => {
+  return fetch(url, options);
+};
+
 const publishSurvey = () => {
   const surveyMetaData = JSON.stringify({
     SurveyStatus: "Active",
@@ -13,7 +17,7 @@ const publishSurvey = () => {
   };
 
   //Update metadata for Survey to set its status to active
-  fetch(
+  restRequest(
     `${BASE_URL}/API/v3/survey-definitions/${ids.SURVEY_ID}/metadata`,
     updateMetaDataRequestOptions
   );
@@ -177,7 +181,7 @@ const createQuestion = async (surveyID, questionObject) => {
     redirect: "follow",
   };
 
-  await fetch(
+  await restRequest(
     `${BASE_URL}/API/v3/survey-definitions/${surveyID}/questions`,
     options
   );
@@ -191,7 +195,7 @@ const updateQuestion = async (surveyID, questionObject) => {
     redirect: "follow",
   };
 
-  await fetch(
+  await restRequest(
     `${BASE_URL}/API/v3/survey-definitions/${surveyID}/questions/${
       JSON.parse(questionObject).QuestionID
     }`,
@@ -211,7 +215,7 @@ export const addQuestion = async (params) => {
   };
 
   //getting questionID's for survey
-  const getQuestionsRes = await fetch(
+  const getQuestionsRes = await restRequest(
     `${BASE_URL}/API/v3/survey-definitions/${surveyID}/questions`,
     getQuestionsDataRequestOptions
   );
@@ -305,7 +309,7 @@ export const sendToUser = async (params) => {
     redirect: "follow",
   };
 
-  const addContactRes = await fetch(
+  const addContactRes = await restRequest(
     `${BASE_URL}/API/v3/directories/${ids.DEFAULT_DIRECTORY}/mailinglists/${mailingListId}/contacts`,
     addContactRequestOptions
   );
@@ -353,7 +357,10 @@ export const sendToUser = async (params) => {
     redirect: "follow",
   };
 
-  await fetch(`${BASE_URL}/API/v3/distributions`, sendToUserRequestOptions);
+  await restRequest(
+    `${BASE_URL}/API/v3/distributions`,
+    sendToUserRequestOptions
+  );
 };
 
 export const exportData = async () => {
@@ -363,7 +370,7 @@ export const exportData = async () => {
     headers: headers,
     redirect: "follow",
   };
-  const getQuestionsRes = await fetch(
+  const getQuestionsRes = await restRequest(
     `${BASE_URL}/API/v3/survey-definitions/${ids.SURVEY_ID}/questions`,
     getQuestionsDataRequestOptions
   );
@@ -391,7 +398,7 @@ export const exportData = async () => {
     body: startExportData,
     redirect: "follow",
   };
-  const startExportRes = await fetch(
+  const startExportRes = await restRequest(
     `${BASE_URL}/API/v3/surveys/${ids.SURVEY_ID}/export-responses`,
     startExportRequestOptions
   );
@@ -404,13 +411,13 @@ export const exportData = async () => {
     redirect: "follow",
   };
 
-  let getExportProgressRes = await fetch(
+  let getExportProgressRes = await restRequest(
     `${BASE_URL}/API/v3/surveys/${ids.SURVEY_ID}/export-responses/${startExportObj.result.progressId}`,
     getExportProgressRequestOptions
   );
   let getExportProgressObj = await getExportProgressRes.json();
   if (getExportProgressObj.result.status != "complete") {
-    getExportProgressRes = await fetch(
+    getExportProgressRes = await restRequest(
       `${BASE_URL}/API/v3/surveys/${ids.SURVEY_ID}/export-responses/${startExportObj.result.progressId}`,
       getExportProgressRequestOptions
     );
@@ -423,7 +430,7 @@ export const exportData = async () => {
     headers,
     redirect: "follow",
   };
-  const getExportFileRes = await fetch(
+  const getExportFileRes = await restRequest(
     `${BASE_URL}/API/v3/surveys/${ids.SURVEY_ID}/export-responses/${getExportProgressObj.result.fileId}/file`,
     getExportFileRequestOptions
   );
