@@ -1,4 +1,4 @@
-import { ids, headers } from "./constants";
+import { ids, headers, BASE_URL } from "./constants";
 
 const publishSurvey = () => {
   const surveyMetaData = JSON.stringify({
@@ -14,7 +14,7 @@ const publishSurvey = () => {
 
   //Update metadata for Survey to set its status to active
   fetch(
-    `https://iad1.qualtrics.com/API/v3/survey-definitions/${ids.SURVEY_ID}/metadata`,
+    `${BASE_URL}/API/v3/survey-definitions/${ids.SURVEY_ID}/metadata`,
     updateMetaDataRequestOptions
   );
 };
@@ -178,7 +178,7 @@ const createQuestion = async (surveyID, questionObject) => {
   };
 
   await fetch(
-    `https://iad1.qualtrics.com/API/v3/survey-definitions/${surveyID}/questions`,
+    `${BASE_URL}/API/v3/survey-definitions/${surveyID}/questions`,
     options
   );
 };
@@ -192,7 +192,7 @@ const updateQuestion = async (surveyID, questionObject) => {
   };
 
   await fetch(
-    `https://iad1.qualtrics.com/API/v3/survey-definitions/${surveyID}/questions/${
+    `${BASE_URL}/API/v3/survey-definitions/${surveyID}/questions/${
       JSON.parse(questionObject).QuestionID
     }`,
     options
@@ -212,7 +212,7 @@ export const addQuestion = async (params) => {
 
   //getting questionID's for survey
   const getQuestionsRes = await fetch(
-    `https://iad1.qualtrics.com/API/v3/survey-definitions/${surveyID}/questions`,
+    `${BASE_URL}/API/v3/survey-definitions/${surveyID}/questions`,
     getQuestionsDataRequestOptions
   );
   const getQuestionsObj = await getQuestionsRes.json();
@@ -306,7 +306,7 @@ export const sendToUser = async (params) => {
   };
 
   const addContactRes = await fetch(
-    `https://iad1.qualtrics.com/API/v3/directories/${ids.DEFAULT_DIRECTORY}/mailinglists/${mailingListId}/contacts`,
+    `${BASE_URL}/API/v3/directories/${ids.DEFAULT_DIRECTORY}/mailinglists/${mailingListId}/contacts`,
     addContactRequestOptions
   );
   const addContactObj = await addContactRes.json();
@@ -353,10 +353,7 @@ export const sendToUser = async (params) => {
     redirect: "follow",
   };
 
-  await fetch(
-    "https://iad1.qualtrics.com/API/v3/distributions",
-    sendToUserRequestOptions
-  );
+  await fetch(`${BASE_URL}/API/v3/distributions`, sendToUserRequestOptions);
 };
 
 export const exportData = async () => {
@@ -367,7 +364,7 @@ export const exportData = async () => {
     redirect: "follow",
   };
   const getQuestionsRes = await fetch(
-    `https://iad1.qualtrics.com/API/v3/survey-definitions/${ids.SURVEY_ID}/questions`,
+    `${BASE_URL}/API/v3/survey-definitions/${ids.SURVEY_ID}/questions`,
     getQuestionsDataRequestOptions
   );
   const getQuestionsObj = await getQuestionsRes.json();
@@ -395,7 +392,7 @@ export const exportData = async () => {
     redirect: "follow",
   };
   const startExportRes = await fetch(
-    `https://iad1.qualtrics.com/API/v3/surveys/${ids.SURVEY_ID}/export-responses`,
+    `${BASE_URL}/API/v3/surveys/${ids.SURVEY_ID}/export-responses`,
     startExportRequestOptions
   );
   const startExportObj = await startExportRes.json();
@@ -408,13 +405,13 @@ export const exportData = async () => {
   };
 
   let getExportProgressRes = await fetch(
-    `https://iad1.qualtrics.com/API/v3/surveys/${ids.SURVEY_ID}/export-responses/${startExportObj.result.progressId}`,
+    `${BASE_URL}/API/v3/surveys/${ids.SURVEY_ID}/export-responses/${startExportObj.result.progressId}`,
     getExportProgressRequestOptions
   );
   let getExportProgressObj = await getExportProgressRes.json();
   if (getExportProgressObj.result.status != "complete") {
     getExportProgressRes = await fetch(
-      `https://iad1.qualtrics.com/API/v3/surveys/${ids.SURVEY_ID}/export-responses/${startExportObj.result.progressId}`,
+      `${BASE_URL}/API/v3/surveys/${ids.SURVEY_ID}/export-responses/${startExportObj.result.progressId}`,
       getExportProgressRequestOptions
     );
     getExportProgressObj = await getExportProgressRes.json();
@@ -427,7 +424,7 @@ export const exportData = async () => {
     redirect: "follow",
   };
   const getExportFileRes = await fetch(
-    `https://iad1.qualtrics.com/API/v3/surveys/${ids.SURVEY_ID}/export-responses/${getExportProgressObj.result.fileId}/file`,
+    `${BASE_URL}/API/v3/surveys/${ids.SURVEY_ID}/export-responses/${getExportProgressObj.result.fileId}/file`,
     getExportFileRequestOptions
   );
   const getExportFileObj = await getExportFileRes.json();
