@@ -2,12 +2,14 @@ import { ids, headers, BASE_URL } from "./constants";
 import axios from "axios";
 
 const restRequest = (url, options) => {
-  //   return fetch(url, options).then((res) => res.json());
-  return axios({
-    url,
-    ...options,
-    data: options.body,
-  }).then((res) => res.data);
+
+  return fetch(url, options).then((res) => res.json());
+
+  // return ({
+  //   url,
+  //   ...options,
+  //   data: options.body,
+  // }).then((res) => res.data);
 };
 
 const publishSurvey = () => {
@@ -278,7 +280,14 @@ export const addQuestion = async (params) => {
 };
 
 export const sendToUser = async (params) => {
-  const {
+
+  // {{reviewerFirstName}}
+  // {{reviewerLastName}}
+  // {{revieweeFirstName}}
+  // {{revieweeLastName}}
+  // {{surveyURL}}
+
+  let {
     reviewerFirstName,
     reviewerLastName,
     reviewerEmail,
@@ -290,9 +299,19 @@ export const sendToUser = async (params) => {
     emailFromAddress,
     emailFromName,
     emailSubject,
+    emailBody
   } = params;
 
   const mailingListId = ids.MAILINGLIST_ID;
+  const surveyURL =
+    "${l://SurveyURL}&sf" +
+    itemList.split(",").join("=1&sf") +
+    "=1&revieweeFirstName=" +
+    revieweeFirstName +
+    "&revieweeLastName=" +
+    revieweeLastName +
+    "&revieweeID=" +
+    revieweeID;
 
   const addContactData = JSON.stringify({
     firstName: reviewerFirstName,
@@ -319,23 +338,32 @@ export const sendToUser = async (params) => {
     addContactRequestOptions
   );
 
-  const linkWrapper =
-    "<a href=${l://SurveyURL}&sf" +
-    itemList.split(",").join("=1&sf") +
-    "=1&revieweeFirstName=" +
-    revieweeFirstName +
-    "&revieweeLastName=" +
-    revieweeLastName +
-    "&revieweeID=" +
-    revieweeID +
-    ">Click Here for Survey</a>";
 
-  const timeElapsed = Date.now();
+  if(!emailBody) {
+    emailBody = `Hello {{reviewerFirstName}} {{reviewerLastName}}, 
+      <p>Please click <a href="{{surveyURL}}">here</a> to complete a brief review of {{revieweeFirstName}} {{revieweeLastName}}.</p>
+      <p>Thank you for participating in the USSF Guardian Review Program.</p>
+      `;
+  }
+
+  emailBody = emailBody.replaceAll("{{surveyURL}}",surveyURL)
+  emailBody = emailBody.replaceAll("{{reviewerFirstName}}",reviewerFirstName)
+  emailBody = emailBody.replaceAll("{{reviewerLastName}}",reviewerLastName)
+  emailBody = emailBody.replaceAll("{{revieweeFirstName}}",revieweeFirstName)
+  emailBody = emailBody.replaceAll("{{revieweeLastName}}",revieweeLastName)
+  emailSubject = emailSubject.replaceAll("{{reviewerFirstName}}",reviewerFirstName)
+  emailSubject = emailSubject.replaceAll("{{reviewerLastName}}",reviewerLastName)
+  emailSubject = emailSubject.replaceAll("{{revieweeFirstName}}",revieweeFirstName)
+  emailSubject = emailSubject.replaceAll("{{revieweeLastName}}",revieweeLastName)
+
+  const timeElapsed = Date.now();  
   const today = new Date(timeElapsed);
+
+  emailBody += `</br><p style="display:none">Sent on ${today.toDateString()} at ${today.toTimeString()}</p>`
 
   const sendToUserData = JSON.stringify({
     message: {
-      messageText: linkWrapper,
+      messageText: emailBody,
     },
     recipients: {
       mailingListId: mailingListId,
@@ -367,7 +395,7 @@ export const sendToUser = async (params) => {
   );
 };
 
-export const exportData = async () => {
+export const exportData = async (filterId = ids.EXPORT_LAST14) => {
   // get question meta data
   const getQuestionsDataRequestOptions = {
     method: "GET",
@@ -388,11 +416,11 @@ export const exportData = async () => {
     compress: false,
   };
 
-  const filterID = ids.EXPORT_LAST14; //filter can be changed here
-  if (filterID) {
-    exportDataObj.filterId = filterID;
+  if(filterId) {
+    // Qualtrics doesn't like null filters, so we leave it out if it's not there
+    exportDataObj.filterId = filterId;
   }
-
+ 
   // starting the response export
   const startExportData = JSON.stringify(exportDataObj);
   const startExportRequestOptions = {
