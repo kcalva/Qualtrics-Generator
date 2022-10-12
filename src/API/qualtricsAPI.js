@@ -2,12 +2,12 @@ import { ids, headers, BASE_URL } from "./constants";
 import axios from "axios";
 
 const restRequest = (url, options) => {
-  return fetch(url, options);
-  //   return axios({
-  //     url,
-  //     ...options,
-  //     data: options.body,
-  //   });
+  //   return fetch(url, options).then((res) => res.json());
+  return axios({
+    url,
+    ...options,
+    data: options.body,
+  }).then((res) => res.data);
 };
 
 const publishSurvey = () => {
@@ -225,10 +225,9 @@ export const addQuestion = async (params) => {
     `${BASE_URL}/API/v3/survey-definitions/${surveyID}/questions`,
     getQuestionsDataRequestOptions
   );
-  const getQuestionsObj = await getQuestionsRes.json();
 
   const questionMap = {};
-  getQuestionsObj.result.elements.forEach((e) => {
+  getQuestionsRes.result.elements.forEach((e) => {
     questionMap[e.DataExportTag] = e;
   });
 
@@ -319,7 +318,6 @@ export const sendToUser = async (params) => {
     `${BASE_URL}/API/v3/directories/${ids.DEFAULT_DIRECTORY}/mailinglists/${mailingListId}/contacts`,
     addContactRequestOptions
   );
-  const addContactObj = await addContactRes.json();
 
   const linkWrapper =
     "<a href=${l://SurveyURL}&sf" +
@@ -341,7 +339,7 @@ export const sendToUser = async (params) => {
     },
     recipients: {
       mailingListId: mailingListId,
-      contactId: addContactObj.result.contactLookupId,
+      contactId: addContactRes.result.contactLookupId,
     },
     header: {
       fromEmail: emailFromAddress,
@@ -380,9 +378,8 @@ export const exportData = async () => {
     `${BASE_URL}/API/v3/survey-definitions/${ids.SURVEY_ID}/questions`,
     getQuestionsDataRequestOptions
   );
-  const getQuestionsObj = await getQuestionsRes.json();
   const questionMap = {};
-  getQuestionsObj.result.elements.forEach((e) => {
+  getQuestionsRes.result.elements.forEach((e) => {
     questionMap[e.QuestionID] = e;
   });
 
@@ -408,7 +405,6 @@ export const exportData = async () => {
     `${BASE_URL}/API/v3/surveys/${ids.SURVEY_ID}/export-responses`,
     startExportRequestOptions
   );
-  const startExportObj = await startExportRes.json();
 
   //Get the progress of the export
   const getExportProgressRequestOptions = {
@@ -418,16 +414,14 @@ export const exportData = async () => {
   };
 
   let getExportProgressRes = await restRequest(
-    `${BASE_URL}/API/v3/surveys/${ids.SURVEY_ID}/export-responses/${startExportObj.result.progressId}`,
+    `${BASE_URL}/API/v3/surveys/${ids.SURVEY_ID}/export-responses/${startExportRes.result.progressId}`,
     getExportProgressRequestOptions
   );
-  let getExportProgressObj = await getExportProgressRes.json();
-  if (getExportProgressObj.result.status != "complete") {
+  if (getExportProgressRes.result.status != "complete") {
     getExportProgressRes = await restRequest(
-      `${BASE_URL}/API/v3/surveys/${ids.SURVEY_ID}/export-responses/${startExportObj.result.progressId}`,
+      `${BASE_URL}/API/v3/surveys/${ids.SURVEY_ID}/export-responses/${startExportRes.result.progressId}`,
       getExportProgressRequestOptions
     );
-    getExportProgressObj = await getExportProgressRes.json();
   }
 
   //Get the export file
@@ -437,14 +431,13 @@ export const exportData = async () => {
     redirect: "follow",
   };
   const getExportFileRes = await restRequest(
-    `${BASE_URL}/API/v3/surveys/${ids.SURVEY_ID}/export-responses/${getExportProgressObj.result.fileId}/file`,
+    `${BASE_URL}/API/v3/surveys/${ids.SURVEY_ID}/export-responses/${getExportProgressRes.result.fileId}/file`,
     getExportFileRequestOptions
   );
-  const getExportFileObj = await getExportFileRes.json();
 
   // Transform file
   let results = [];
-  getExportFileObj.responses.forEach((response) => {
+  getExportFileRes.responses.forEach((response) => {
     if (response.values.finished != 1) {
       return; // ignore unfinished respones
     }
