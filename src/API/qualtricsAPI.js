@@ -31,7 +31,7 @@ const publishSurvey = () => {
   );
 };
 
-const getRatingQuestionData = (questionTag, qID, numChoices, questionText) => {
+const getRatingQuestionData = (questionTag, qID, numChoices, questionText, answerText=[]) => {
   const questionJson = JSON.stringify({
     QuestionText: questionText,
     QuestionDescription: questionText,
@@ -58,28 +58,28 @@ const getRatingQuestionData = (questionTag, qID, numChoices, questionText) => {
     Choices:
       numChoices === "4"
         ? {
-            1: { Display: "Strongly disagree" },
-            2: { Display: "Disagree" },
-            3: { Display: "Agree" },
-            4: { Display: "Strongly agree" },
+            1: { Display: answerText[0]?answerText[0]:"Strongly disagree" },
+            2: { Display: answerText[1]?answerText[1]:"Disagree" },
+            3: { Display: answerText[2]?answerText[2]:"Agree" },
+            4: { Display: answerText[3]?answerText[3]:"Strongly agree" },
           }
         : numChoices === "7"
         ? {
-            1: { Display: "Strongly disagree" },
-            2: { Display: "Disagree" },
-            3: { Display: "Somewhat disagree" },
-            4: { Display: "Neither agree nor disagree" },
-            5: { Display: "Somewhat agree" },
-            6: { Display: "Agree" },
-            7: { Display: "Strongly agree" },
+            1: { Display: answerText[0]?answerText[0]:"Strongly disagree" },
+            2: { Display: answerText[1]?answerText[1]:"Disagree" },
+            3: { Display: answerText[2]?answerText[2]:"Somewhat disagree" },
+            4: { Display: answerText[3]?answerText[3]:"Neither agree nor disagree" },
+            5: { Display: answerText[4]?answerText[4]:"Somewhat agree" },
+            6: { Display: answerText[5]?answerText[5]:"Agree" },
+            7: { Display: answerText[6]?answerText[6]:"Strongly agree" },
           }
         : {
             // default to 5
-            1: { Display: "Strongly disagree" },
-            2: { Display: "Disagree" },
-            3: { Display: "Neither agree nor disagree" },
-            4: { Display: "Agree" },
-            5: { Display: "Strongly agree" },
+            1: { Display: answerText[0]?answerText[0]:"Strongly disagree" },
+            2: { Display: answerText[1]?answerText[1]:"Disagree" },
+            3: { Display: answerText[2]?answerText[2]:"Neither agree nor disagree" },
+            4: { Display: answerText[3]?answerText[3]:"Agree" },
+            5: { Display: answerText[4]?answerText[4]:"Strongly agree" },
           },
     ChoiceOrder:
       numChoices === "4"
