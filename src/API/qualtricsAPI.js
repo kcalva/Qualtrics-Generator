@@ -283,18 +283,13 @@ export const sendToUser = async (params) => {
 
   // {{reviewerFirstName}}
   // {{reviewerLastName}}
-  // {{revieweeFirstName}}
-  // {{revieweeLastName}}
-  // {{surveyURL}}
 
   let {
     reviewerFirstName,
     reviewerLastName,
     reviewerEmail,
     reviewerID,
-    revieweeFirstName,
-    revieweeLastName,
-    revieweeID,
+    revieweeList,
     itemList,
     emailFromAddress,
     emailFromName,
@@ -302,27 +297,29 @@ export const sendToUser = async (params) => {
     emailBody
   } = params;
 
+  console.log('list of reviewee ', revieweeList)
+
   const mailingListId = ids.MAILINGLIST_ID;
-  const surveyURL =
-    "${l://SurveyURL}&sf" +
+
+  const surveyURLList = revieweeList.map((r)=>{
+    return  "${l://SurveyURL}&sf" +
     itemList.split(",").join("=1&sf") +
     "=1&revieweeFirstName=" +
-    revieweeFirstName +
+    r.revieweeFirstName +
     "&revieweeLastName=" +
-    revieweeLastName +
+    r.revieweeLastName +
     "&revieweeID=" +
-    revieweeID;
+    r.revieweeID;
+  })
+  
+  console.log('the actual surveyUrl',surveyURLList)
 
   const addContactData = JSON.stringify({
     firstName: reviewerFirstName,
     lastName: reviewerLastName,
     email: reviewerEmail,
     extRef: reviewerID,
-    embeddedData: {
-      revieweeFirstName: revieweeFirstName,
-      revieweeLastName: revieweeLastName,
-      revieweeID: revieweeID,
-    },
+    embeddedData: {},
     language: "en",
   });
 
@@ -340,21 +337,19 @@ export const sendToUser = async (params) => {
 
 
   if(!emailBody) {
-    emailBody = `Hello {{reviewerFirstName}} {{reviewerLastName}}, 
-      <p>Please click <a href="{{surveyURL}}">here</a> to complete a brief review of {{revieweeFirstName}} {{revieweeLastName}}.</p>
-      <p>Thank you for participating in the USSF Guardian Review Program.</p>
-      `;
+    emailBody =`Hello {{reviewerFirstName}} {{reviewerLastName}},`
+    for (let index = 0; index < revieweeList.length; index++) {
+        emailBody += `<p>Please click <a href="${surveyURLList[index]}">here</a> to complete a brief review of ${revieweeList[index].revieweeFirstName} ${revieweeList[index].revieweeLastName}.</p>`
+    }
+    emailBody += `<p>Thank you for participating in the USSF Guardian Review Program.</p>`
   }
 
-  emailBody = emailBody.replaceAll("{{surveyURL}}",surveyURL)
   emailBody = emailBody.replaceAll("{{reviewerFirstName}}",reviewerFirstName)
   emailBody = emailBody.replaceAll("{{reviewerLastName}}",reviewerLastName)
-  emailBody = emailBody.replaceAll("{{revieweeFirstName}}",revieweeFirstName)
-  emailBody = emailBody.replaceAll("{{revieweeLastName}}",revieweeLastName)
+  
+  console.log(emailBody)
   emailSubject = emailSubject.replaceAll("{{reviewerFirstName}}",reviewerFirstName)
   emailSubject = emailSubject.replaceAll("{{reviewerLastName}}",reviewerLastName)
-  emailSubject = emailSubject.replaceAll("{{revieweeFirstName}}",revieweeFirstName)
-  emailSubject = emailSubject.replaceAll("{{revieweeLastName}}",revieweeLastName)
 
   const timeElapsed = Date.now();  
   const today = new Date(timeElapsed);
@@ -377,7 +372,7 @@ export const sendToUser = async (params) => {
     },
     surveyLink: {
       surveyId: ids.SURVEY_ID,
-      type: "Individual",
+      type: "Multiple",
     },
     sendDate: today.toISOString(),
   });
