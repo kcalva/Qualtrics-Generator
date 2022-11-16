@@ -211,8 +211,20 @@ const updateQuestion = async (surveyID, questionObject) => {
   );
 };
 
+
+export const reorderQuestions = async (params) => {
+  let { order } = params
+
+  // TODO: reorder the question pairs based on the order array which contains SFIDs
+
+
+}
+
+
 export const addQuestion = async (params) => {
-  const { questionText, questionID, numChoices, expainQuestionText } = params;
+  const { questionText, questionID, numChoices, expainQuestionText, questionType="choice" } = params;
+
+  // TODO: handle questionType = "text"
 
   const surveyID = ids.SURVEY_ID;
 
@@ -281,15 +293,14 @@ export const addQuestion = async (params) => {
 
 export const sendToUser = async (params) => {
 
-  // {{reviewerFirstName}}
-  // {{reviewerLastName}}
-
   let {
     reviewerFirstName,
     reviewerLastName,
     reviewerEmail,
     reviewerID,
-    revieweeList,
+    revieweeFirstName,
+    revieweeLastName,
+    revieweeID,
     itemList,
     emailFromAddress,
     emailFromName,
@@ -297,22 +308,20 @@ export const sendToUser = async (params) => {
     emailBody
   } = params;
 
-  console.log('list of reviewee ', revieweeList)
+  console.log(params)
 
   const mailingListId = ids.MAILINGLIST_ID;
 
-  const surveyURLList = revieweeList.map((r)=>{
-    return  "${l://SurveyURL}&sf" +
+  const surveyURL = "${l://SurveyURL}&sf" +
     itemList.split(",").join("=1&sf") +
     "=1&revieweeFirstName=" +
-    r.revieweeFirstName +
+    encodeURIComponent(revieweeFirstName) +
     "&revieweeLastName=" +
-    r.revieweeLastName +
+    encodeURIComponent(revieweeLastName) +
     "&revieweeID=" +
-    r.revieweeID;
-  })
-  
-  console.log('the actual surveyUrl',surveyURLList)
+    encodeURIComponent(revieweeID);  
+
+    console.log(surveyURL)
 
   const addContactData = JSON.stringify({
     firstName: reviewerFirstName,
@@ -335,12 +344,9 @@ export const sendToUser = async (params) => {
     addContactRequestOptions
   );
 
-
   if(!emailBody) {
     emailBody =`Hello {{reviewerFirstName}} {{reviewerLastName}},`
-    for (let index = 0; index < revieweeList.length; index++) {
-        emailBody += `<p>Please click <a href="${surveyURLList[index]}">here</a> to complete a brief review of ${revieweeList[index].revieweeFirstName} ${revieweeList[index].revieweeLastName}.</p>`
-    }
+    emailBody += `<p>Please click <a href="${surveyURL}">here</a> to complete a brief review of ${revieweeFirstName} ${revieweeLastName}.</p>`
     emailBody += `<p>Thank you for participating in the USSF Guardian Review Program.</p>`
   }
 
@@ -365,7 +371,7 @@ export const sendToUser = async (params) => {
       contactId: addContactRes.result.contactLookupId,
     },
     header: {
-      fromEmail: emailFromAddress,
+      fromEmail: "noreply@qemailserver.com",
       replyToEmail: emailFromAddress,
       fromName: emailFromName,
       subject: emailSubject,
@@ -390,7 +396,7 @@ export const sendToUser = async (params) => {
   );
 };
 
-export const exportData = async (filterId = ids.EXPORT_LAST14) => {
+export const exportData = async (filterId = null) => {
   // get question meta data
   const getQuestionsDataRequestOptions = {
     method: "GET",
@@ -428,6 +434,7 @@ export const exportData = async (filterId = ids.EXPORT_LAST14) => {
     `${BASE_URL}/API/v3/surveys/${ids.SURVEY_ID}/export-responses`,
     startExportRequestOptions
   );
+  console.log(startExportRes)
 
   //Get the progress of the export
   const getExportProgressRequestOptions = {
@@ -485,7 +492,7 @@ export const exportData = async (filterId = ids.EXPORT_LAST14) => {
         }
       } else {
         let metaList = [
-          "externalDataReference",
+          "externalDataReference", // this is recipientID
           "recipientEmail",
           "recipientFirstName",
           "recipientLastName",
@@ -496,12 +503,17 @@ export const exportData = async (filterId = ids.EXPORT_LAST14) => {
           "revieweeLastName",
         ];
         if (metaList.includes(key)) {
-          row[key] = values[key];
+          if(key==="externalDataReference"){
+            row["recipientID"] = values[key];
+          } else {
+            row[key] = values[key];
+          }          
         }
       }
     });
     results.push(row);
   });
 
+  console.log(results)
   return results;
 };
