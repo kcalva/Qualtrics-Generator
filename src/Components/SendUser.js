@@ -16,8 +16,6 @@ const SendUser = () => {
     const [emailFromName, setEmailFromName] = useState('')
     const [emailSubject, setEmailSubject] = useState('')
 
-    let revieweeList = [{revieweeFirstName:"John",revieweeLastName:"Doe",revieweeID:"john1"},{revieweeFirstName:"Jane",revieweeLastName:"Doe",revieweeID:"jane1"}]
-
 
     return (
         <div>

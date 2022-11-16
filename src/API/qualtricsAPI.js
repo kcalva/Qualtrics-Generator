@@ -293,6 +293,12 @@ export const addQuestion = async (params) => {
 
 export const sendToUser = async (params) => {
 
+  // {{reviewerFirstName}}
+  // {{reviewerLastName}}
+  // {{revieweeFirstName}}
+  // {{revieweeLastName}}
+  // {{surveyURL}}
+
   let {
     reviewerFirstName,
     reviewerLastName,
@@ -328,7 +334,11 @@ export const sendToUser = async (params) => {
     lastName: reviewerLastName,
     email: reviewerEmail,
     extRef: reviewerID,
-    embeddedData: {},
+    embeddedData: {
+      revieweeFirstName: revieweeFirstName,
+      revieweeLastName: revieweeLastName,
+      revieweeID: revieweeID,
+    },
     language: "en",
   });
 
@@ -345,17 +355,21 @@ export const sendToUser = async (params) => {
   );
 
   if(!emailBody) {
-    emailBody =`Hello {{reviewerFirstName}} {{reviewerLastName}},`
-    emailBody += `<p>Please click <a href="${surveyURL}">here</a> to complete a brief review of ${revieweeFirstName} ${revieweeLastName}.</p>`
-    emailBody += `<p>Thank you for participating in the USSF Guardian Review Program.</p>`
+    emailBody = `Hello {{reviewerFirstName}} {{reviewerLastName}}, 
+      <p>Please click <a href="{{surveyURL}}">here</a> to complete a brief review of {{revieweeFirstName}} {{revieweeLastName}}.</p>
+      <p>Thank you for participating in the USSF Guardian Review Program.</p>
+      `;
   }
 
+  emailBody = emailBody.replaceAll("{{surveyURL}}",surveyURL)
   emailBody = emailBody.replaceAll("{{reviewerFirstName}}",reviewerFirstName)
   emailBody = emailBody.replaceAll("{{reviewerLastName}}",reviewerLastName)
-  
-  console.log(emailBody)
+  emailBody = emailBody.replaceAll("{{revieweeFirstName}}",revieweeFirstName)
+  emailBody = emailBody.replaceAll("{{revieweeLastName}}",revieweeLastName)
   emailSubject = emailSubject.replaceAll("{{reviewerFirstName}}",reviewerFirstName)
   emailSubject = emailSubject.replaceAll("{{reviewerLastName}}",reviewerLastName)
+  emailSubject = emailSubject.replaceAll("{{revieweeFirstName}}",revieweeFirstName)
+  emailSubject = emailSubject.replaceAll("{{revieweeLastName}}",revieweeLastName)
 
   const timeElapsed = Date.now();  
   const today = new Date(timeElapsed);
@@ -378,7 +392,7 @@ export const sendToUser = async (params) => {
     },
     surveyLink: {
       surveyId: ids.SURVEY_ID,
-      type: "Multiple",
+      type: "Individual",
     },
     sendDate: today.toISOString(),
   });
