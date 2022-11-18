@@ -31,7 +31,7 @@ const publishSurvey = () => {
   );
 };
 
-const getRatingQuestionData = (questionTag, qID, numChoices, questionText) => {
+const getRatingQuestionData = (questionTag, qID, numChoices, questionText, answerText=[]) => {
   const questionJson = JSON.stringify({
     QuestionText: questionText,
     QuestionDescription: questionText,
@@ -58,28 +58,28 @@ const getRatingQuestionData = (questionTag, qID, numChoices, questionText) => {
     Choices:
       numChoices === "4"
         ? {
-            1: { Display: "Strongly disagree" },
-            2: { Display: "Disagree" },
-            3: { Display: "Agree" },
-            4: { Display: "Strongly agree" },
+            1: { Display: answerText[0]?answerText[0]:"Strongly disagree" },
+            2: { Display: answerText[1]?answerText[1]:"Disagree" },
+            3: { Display: answerText[2]?answerText[2]:"Agree" },
+            4: { Display: answerText[3]?answerText[3]:"Strongly agree" },
           }
         : numChoices === "7"
         ? {
-            1: { Display: "Strongly disagree" },
-            2: { Display: "Disagree" },
-            3: { Display: "Somewhat disagree" },
-            4: { Display: "Neither agree nor disagree" },
-            5: { Display: "Somewhat agree" },
-            6: { Display: "Agree" },
-            7: { Display: "Strongly agree" },
+            1: { Display: answerText[0]?answerText[0]:"Strongly disagree" },
+            2: { Display: answerText[1]?answerText[1]:"Disagree" },
+            3: { Display: answerText[2]?answerText[2]:"Somewhat disagree" },
+            4: { Display: answerText[3]?answerText[3]:"Neither agree nor disagree" },
+            5: { Display: answerText[4]?answerText[4]:"Somewhat agree" },
+            6: { Display: answerText[5]?answerText[5]:"Agree" },
+            7: { Display: answerText[6]?answerText[6]:"Strongly agree" },
           }
         : {
             // default to 5
-            1: { Display: "Strongly disagree" },
-            2: { Display: "Disagree" },
-            3: { Display: "Neither agree nor disagree" },
-            4: { Display: "Agree" },
-            5: { Display: "Strongly agree" },
+            1: { Display: answerText[0]?answerText[0]:"Strongly disagree" },
+            2: { Display: answerText[1]?answerText[1]:"Disagree" },
+            3: { Display: answerText[2]?answerText[2]:"Neither agree nor disagree" },
+            4: { Display: answerText[3]?answerText[3]:"Agree" },
+            5: { Display: answerText[4]?answerText[4]:"Strongly agree" },
           },
     ChoiceOrder:
       numChoices === "4"
@@ -211,8 +211,20 @@ const updateQuestion = async (surveyID, questionObject) => {
   );
 };
 
+
+export const reorderQuestions = async (params) => {
+  let { order } = params
+
+  // TODO: reorder the question pairs based on the order array which contains SFIDs
+
+
+}
+
+
 export const addQuestion = async (params) => {
-  const { questionText, questionID, numChoices, expainQuestionText } = params;
+  const { questionText, questionID, numChoices, expainQuestionText, questionType="choice" } = params;
+
+  // TODO: handle questionType = "text"
 
   const surveyID = ids.SURVEY_ID;
 
@@ -302,16 +314,20 @@ export const sendToUser = async (params) => {
     emailBody
   } = params;
 
+  console.log(params)
+
   const mailingListId = ids.MAILINGLIST_ID;
-  const surveyURL =
-    "${l://SurveyURL}&sf" +
+
+  const surveyURL = "${l://SurveyURL}&sf" +
     itemList.split(",").join("=1&sf") +
     "=1&revieweeFirstName=" +
-    revieweeFirstName +
+    encodeURIComponent(revieweeFirstName) +
     "&revieweeLastName=" +
-    revieweeLastName +
+    encodeURIComponent(revieweeLastName) +
     "&revieweeID=" +
-    revieweeID;
+    encodeURIComponent(revieweeID);  
+
+    console.log(surveyURL)
 
   const addContactData = JSON.stringify({
     firstName: reviewerFirstName,
@@ -337,7 +353,6 @@ export const sendToUser = async (params) => {
     `${BASE_URL}/API/v3/directories/${ids.DEFAULT_DIRECTORY}/mailinglists/${mailingListId}/contacts`,
     addContactRequestOptions
   );
-
 
   if(!emailBody) {
     emailBody = `Hello {{reviewerFirstName}} {{reviewerLastName}}, 
@@ -370,7 +385,7 @@ export const sendToUser = async (params) => {
       contactId: addContactRes.result.contactLookupId,
     },
     header: {
-      fromEmail: emailFromAddress,
+      fromEmail: "noreply@qemailserver.com",
       replyToEmail: emailFromAddress,
       fromName: emailFromName,
       subject: emailSubject,
@@ -395,7 +410,7 @@ export const sendToUser = async (params) => {
   );
 };
 
-export const exportData = async (filterId = ids.EXPORT_LAST14) => {
+export const exportData = async (filterId = null) => {
   // get question meta data
   const getQuestionsDataRequestOptions = {
     method: "GET",
@@ -433,6 +448,7 @@ export const exportData = async (filterId = ids.EXPORT_LAST14) => {
     `${BASE_URL}/API/v3/surveys/${ids.SURVEY_ID}/export-responses`,
     startExportRequestOptions
   );
+  console.log(startExportRes)
 
   //Get the progress of the export
   const getExportProgressRequestOptions = {
@@ -490,7 +506,7 @@ export const exportData = async (filterId = ids.EXPORT_LAST14) => {
         }
       } else {
         let metaList = [
-          "externalDataReference",
+          "externalDataReference", // this is recipientID
           "recipientEmail",
           "recipientFirstName",
           "recipientLastName",
@@ -501,12 +517,17 @@ export const exportData = async (filterId = ids.EXPORT_LAST14) => {
           "revieweeLastName",
         ];
         if (metaList.includes(key)) {
-          row[key] = values[key];
+          if(key==="externalDataReference"){
+            row["recipientID"] = values[key];
+          } else {
+            row[key] = values[key];
+          }          
         }
       }
     });
     results.push(row);
   });
 
+  console.log(results)
   return results;
 };

@@ -55,7 +55,7 @@ const SendUser = () => {
                         reviewerEmail,
                         reviewerID,
                         revieweeFirstName,
-                        revieweeLastName, 
+                        revieweeLastName,
                         revieweeID,
                         itemList,
                         emailFromAddress, 
