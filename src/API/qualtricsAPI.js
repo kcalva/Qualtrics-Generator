@@ -181,6 +181,50 @@ const getTextEntryQuestionData = (
   return questionJson;
 };
 
+const getTextGraphicQuestionData = (questionTag, qID, questionText) =>{
+  let question= {}
+  if(questionText === "&nbsp;"){
+    question.DisplayLogic ={
+      0: {
+          0: {
+              LogicType: "BooleanValue",
+              Value: "False",
+              Type: "Expression",
+              Description: "<span class=\"ConjDesc\">If</span><span> False</span>"
+          },
+          Type: "If"
+      },
+      Type: "BooleanExpression",
+      inPage: false
+    }
+  }
+  const questionJson = JSON.stringify({
+      QuestionText: questionText,
+      DefaultChoices: false,
+      DataExportTag: questionTag,
+      QuestionType: "DB",
+      Selector: "TB",
+      Configuration: {
+          "QuestionDescriptionOption": "UseText"
+      },
+      QuestionDescription: questionText === "&nbsp;"?" ":questionText,
+      ChoiceOrder: [],
+      Validation: {
+          Settings: {
+              Type: "None"
+          }
+      },
+      GradingData: [],
+      Language: [],
+      NextChoiceId: 4,
+      NextAnswerId: 1,
+      QuestionID: qID,
+      QuestionText_Unsafe: questionText,
+      ...question
+  })
+  return questionJson
+}
+
 const createQuestion = async (surveyID, questionObject) => {
   const options = {
     method: "POST",
@@ -250,43 +294,59 @@ export const addQuestion = async (params) => {
 
   if (QID) {
     // update question
-    let questionData = getRatingQuestionData(
-      questionID,
-      QID,
-      numChoices,
-      questionText
-    );
-    await updateQuestion(surveyID, questionData);
-    let textQuestionData = getTextEntryQuestionData(
-      params.questionID,
-      QID_why,
-      QID,
-      params.numChoices,
-      params.expainQuestionText
-    );
-    await updateQuestion(surveyID, textQuestionData);
+    if(questionType ==="choice"){  
+      let questionData = getRatingQuestionData(
+        questionID,
+        QID,
+        numChoices,
+        questionText
+      );
+      await updateQuestion(surveyID, questionData);
+      let textQuestionData = getTextEntryQuestionData(
+        params.questionID,
+        QID_why,
+        QID,
+        params.numChoices,
+        params.expainQuestionText
+      );
+      await updateQuestion(surveyID, textQuestionData);
+    }
+    else if(questionType === "text"){
+      let textGraphicData = getTextGraphicQuestionData(questionID,QID,questionText)
+      await updateQuestion(surveyID, textGraphicData)
+    }
   } else {
     // create question
     const qid_offset = 2; // QID's start at 2 after the placeholder question is deleted and trash emptied
 
     QID = "QID" + (Object.keys(questionMap).length + qid_offset);
-    let questionData = getRatingQuestionData(
-      questionID,
-      QID,
-      numChoices,
-      questionText
-    );
-    await createQuestion(surveyID, questionData);
 
-    QID_why = "QID" + (Object.keys(questionMap).length + qid_offset + 1); // the "why" is always the next QID
-    let textQuestionData = getTextEntryQuestionData(
-      questionID,
-      QID_why,
-      QID,
-      numChoices,
-      expainQuestionText
-    );
-    await createQuestion(surveyID, textQuestionData);
+    if(questionType ==="choice"){  
+      let questionData = getRatingQuestionData(
+        questionID,
+        QID,
+        numChoices,
+        questionText
+      );
+      await createQuestion(surveyID, questionData);
+
+      QID_why = "QID" + (Object.keys(questionMap).length + qid_offset + 1); // the "why" is always the next QID
+      let textQuestionData = getTextEntryQuestionData(
+        questionID,
+        QID_why,
+        QID,
+        numChoices,
+        expainQuestionText
+      );
+      await createQuestion(surveyID, textQuestionData);
+    }
+    else if(questionType === "text"){
+      let textGraphicData = getTextGraphicQuestionData(questionID,QID,questionText)
+      await createQuestion(surveyID, textGraphicData);
+      QID_why = "QID" + (Object.keys(questionMap).length + qid_offset + 1) // the "why" is always the next QID
+      let blankData = getTextGraphicQuestionData(questionID + "_why",QID_why,"&nbsp;")
+      await createQuestion(surveyID, blankData);
+    }
   }
   await publishSurvey();
 };
