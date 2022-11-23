@@ -260,7 +260,49 @@ export const reorderQuestions = async (params) => {
   let { order } = params
 
   // TODO: reorder the question pairs based on the order array which contains SFIDs
+  const surveyID = ids.SURVEY_ID
+  
+  const getSurveyOptions = {
+    method: 'GET',
+    headers,
+    redirect: 'follow'
+  }
 
+  const getSurveyRes = await restRequest(
+    `${BASE_URL}/API/v3/survey-definitions/${surveyID}`,
+    getSurveyOptions
+  )
+
+  const blockID = getSurveyRes.result.SurveyFlow.Flow[0].ID
+
+  const questions = getSurveyRes.result.Questions
+  const sorted = Object.keys(questions).sort((a,b)=>order.indexOf(a)-order.indexOf(b))
+
+  let blockElements = getSurveyRes.result.Blocks[blockID].BlockElements
+
+  for (let index = 0; index <sorted.length; index++) {
+    const qID = sorted[index];
+    blockElements[index].QuestionID = qID
+  }
+  
+  const blockData = JSON.stringify({
+    Type: "Default",
+    Description: "Default Question Block",
+    ID: blockID,
+    BlockElements: blockElements
+  })
+
+  const updateBlockOptions = {
+    method: 'PUT',
+    headers,
+    body: blockData,
+    redirect: 'follow'
+  }
+
+  await restRequest(
+    `${BASE_URL}/API/v3/survey-definitions/${surveyID}/blocks/${blockID}`,
+    updateBlockOptions
+  )
 
 }
 
