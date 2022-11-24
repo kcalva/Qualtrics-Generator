@@ -276,12 +276,21 @@ export const reorderQuestions = async (params) => {
   const blockID = getSurveyRes.result.SurveyFlow.Flow[0].ID
 
   const questions = getSurveyRes.result.Questions
-  const sorted = Object.keys(questions).sort((a,b)=>order.indexOf(a)-order.indexOf(b))
+
+  const questionMap = {}
+  Object.values(questions).forEach((e) => {
+    questionMap[e.DataExportTag] = e;
+  })
+
+  const sorted = Object.values(Object.keys(questionMap).sort((a,b)=>order.indexOf(a)-order.indexOf(b)).reduce((accumulator,key)=>{
+    accumulator[key] = questionMap[key]
+    return accumulator
+  },{}))
 
   let blockElements = getSurveyRes.result.Blocks[blockID].BlockElements
 
-  for (let index = 0; index <sorted.length; index++) {
-    const qID = sorted[index];
+  for (let index = 0; index <blockElements.length; index++) {
+    const qID = sorted[index].QuestionID;
     blockElements[index].QuestionID = qID
   }
   
