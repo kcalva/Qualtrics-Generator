@@ -255,6 +255,13 @@ const updateQuestion = async (surveyID, questionObject) => {
   );
 };
 
+const getQuestionMap = (questions) => { 
+  let questionMap = {}
+  questions.forEach((e) => {
+    questionMap[e.DataExportTag] = e;
+  })
+  return questionMap
+}
 
 export const reorderQuestions = async (params) => {
   let { order } = params
@@ -277,10 +284,7 @@ export const reorderQuestions = async (params) => {
 
   const questions = getSurveyRes.result.Questions
 
-  const questionMap = {}
-  Object.values(questions).forEach((e) => {
-    questionMap[e.DataExportTag] = e;
-  })
+  const questionMap = getQuestionMap(Object.values(questions))
 
   const sorted = Object.values(Object.keys(questionMap).sort((a,b)=>order.indexOf(a)-order.indexOf(b)).reduce((accumulator,key)=>{
     accumulator[key] = questionMap[key]
@@ -335,10 +339,7 @@ export const addQuestion = async (params) => {
     getQuestionsDataRequestOptions
   );
 
-  const questionMap = {};
-  getQuestionsRes.result.elements.forEach((e) => {
-    questionMap[e.DataExportTag] = e;
-  });
+  const questionMap = getQuestionMap(getQuestionsRes.result.elements)
 
   let QID = questionMap[questionID]?.QuestionID;
   let QID_why = questionMap[questionID + "_why"]?.QuestionID;
