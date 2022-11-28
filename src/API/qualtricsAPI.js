@@ -340,8 +340,9 @@ export const reorderQuestions = async (params) => {
 
 }
 
-
 export const addQuestion = async (params) => {
+  // questionType = choice requires all params
+  // questionType = text only requires questionText and questionID
   const { questionText, questionID, numChoices, expainQuestionText, questionType="choice" } = params;
 
   const surveyID = ids.SURVEY_ID;
