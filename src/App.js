@@ -2,6 +2,7 @@ import './App.css'
 import CreateQuestions from './Components/CreateQuestions'
 import SendUser from './Components/SendUser'
 import ExportData from './Components/ExportData'
+import ReorderQuestions from './Components/ReorderQuestions'
 
 const App = () => {
   
@@ -11,6 +12,10 @@ const App = () => {
         <CreateQuestions/>
         <SendUser/>
         <ExportData/>
+
+        <ReorderQuestions/>
+
+
       </header>
     </div>
   )

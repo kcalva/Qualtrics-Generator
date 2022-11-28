@@ -266,6 +266,18 @@ const getQuestionMap = (questions) => {
 export const reorderQuestions = async (params) => {
   let { order } = params
 
+
+  console.log(order)
+  let newOrder = []
+  order.forEach((sfid)=>{
+    newOrder.push(sfid)
+    newOrder.push(sfid+"_why")
+  })
+  console.log(newOrder)
+
+
+ 
+
   // TODO: reorder the question pairs based on the order array which contains SFIDs
   const surveyID = ids.SURVEY_ID
   
@@ -280,18 +292,26 @@ export const reorderQuestions = async (params) => {
     getSurveyOptions
   )
 
+
   const blockID = getSurveyRes.result.SurveyFlow.Flow[0].ID
 
+  const block = getSurveyRes.result.Blocks[blockID]
+
   const questions = getSurveyRes.result.Questions
+  console.log(questions)
 
   const questionMap = getQuestionMap(Object.values(questions))
+  console.log(questionMap)
 
   const sorted = Object.values(Object.keys(questionMap).sort((a,b)=>order.indexOf(a)-order.indexOf(b)).reduce((accumulator,key)=>{
     accumulator[key] = questionMap[key]
     return accumulator
   },{}))
 
-  let blockElements = getSurveyRes.result.Blocks[blockID].BlockElements
+  console.log(sorted)
+  return
+
+  let blockElements = block.BlockElements
 
   for (let index = 0; index <blockElements.length; index++) {
     const qID = sorted[index].QuestionID;
@@ -299,8 +319,8 @@ export const reorderQuestions = async (params) => {
   }
   
   const blockData = JSON.stringify({
-    Type: "Default",
-    Description: "Default Question Block",
+    Type: block.Type,
+    Description: block.Description,
     ID: blockID,
     BlockElements: blockElements
   })
