@@ -266,63 +266,64 @@ const getQuestionMap = (questions) => {
 export const reorderQuestions = async (params) => {
   let { order } = params
 
-
-  console.log(order)
-  let newOrder = []
-  order.forEach((sfid)=>{
-    newOrder.push(sfid)
-    newOrder.push(sfid+"_why")
-  })
-  console.log(newOrder)
-
-
- 
-
-  // TODO: reorder the question pairs based on the order array which contains SFIDs
   const surveyID = ids.SURVEY_ID
-  
   const getSurveyOptions = {
     method: 'GET',
     headers,
     redirect: 'follow'
   }
-
   const getSurveyRes = await restRequest(
     `${BASE_URL}/API/v3/survey-definitions/${surveyID}`,
     getSurveyOptions
   )
 
-
   const blockID = getSurveyRes.result.SurveyFlow.Flow[0].ID
-
   const block = getSurveyRes.result.Blocks[blockID]
-
   const questions = getSurveyRes.result.Questions
-  console.log(questions)
-
   const questionMap = getQuestionMap(Object.values(questions))
-  console.log(questionMap)
-
-  const sorted = Object.values(Object.keys(questionMap).sort((a,b)=>order.indexOf(a)-order.indexOf(b)).reduce((accumulator,key)=>{
-    accumulator[key] = questionMap[key]
-    return accumulator
-  },{}))
-
-  console.log(sorted)
-  return
-
+  let questionIDs = Object.keys(questionMap)
   let blockElements = block.BlockElements
 
-  for (let index = 0; index <blockElements.length; index++) {
-    const qID = sorted[index].QuestionID;
-    blockElements[index].QuestionID = qID
-  }
+  blockElements.forEach((e)=>{
+    e.sfid = questions[e.QuestionID].DataExportTag
+  })
+
+  let newOrder = []
+  order.forEach((sfid)=>{
+    newOrder.push(sfid)
+    newOrder.push(sfid+"_why")
+  })
+
+  let unreferenced = []
+  questionIDs.forEach((key)=>{
+    if(newOrder.indexOf(key)==-1)
+      unreferenced.push(key)
+  })
+
+  let topOrder = []
+  blockElements.forEach((e)=>{
+    if(unreferenced.indexOf(e.sfid)>=0){
+      topOrder.push(e.sfid)
+    }
+  })
+
+  newOrder = [...topOrder,...newOrder]
+  let sortedKeys = questionIDs.sort((a,b)=>{
+    return newOrder.indexOf(a)-newOrder.indexOf(b)
+  })
+
+  let newBlockElements = []
+  sortedKeys.forEach((key)=>{
+    let questionData = questionMap[key]
+    let q = {Type:'Question','QuestionID':questionData.QuestionID}
+    newBlockElements.push(q)
+  })
   
   const blockData = JSON.stringify({
     Type: block.Type,
     Description: block.Description,
     ID: blockID,
-    BlockElements: blockElements
+    BlockElements: newBlockElements
   })
 
   const updateBlockOptions = {
@@ -342,8 +343,6 @@ export const reorderQuestions = async (params) => {
 
 export const addQuestion = async (params) => {
   const { questionText, questionID, numChoices, expainQuestionText, questionType="choice" } = params;
-
-  // TODO: handle questionType = "text"
 
   const surveyID = ids.SURVEY_ID;
 
