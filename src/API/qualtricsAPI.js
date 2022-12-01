@@ -31,6 +31,26 @@ const publishSurvey = () => {
   );
 };
 
+const publishNewVersion = async () => {
+  const versionOptions = {
+    method: "POST",
+    redirect: "follow",
+    headers,
+    body: JSON.stringify({
+        "Description": "USSF API Interface",
+        "Published": true
+    })
+  }
+
+  await restRequest(
+      `${BASE_URL}/API/v3/survey-definitions/${ids.SURVEY_ID}/versions`,
+      versionOptions
+  )
+
+}
+
+
+
 const getRatingQuestionData = (questionTag, qID, numChoices, questionText, answerText=[]) => {
   const questionJson = JSON.stringify({
     QuestionText: questionText,
@@ -338,6 +358,8 @@ export const reorderQuestions = async (params) => {
     updateBlockOptions
   )
 
+  await publishNewVersion()
+
 }
 
 export const addQuestion = async (params) => {
@@ -400,7 +422,7 @@ export const addQuestion = async (params) => {
         numChoices,
         questionText
       );
-      await createQuestion(surveyID, questionData);
+      await createQuestion(surveyID, questionData)
 
       QID_why = "QID" + (Object.keys(questionMap).length + qid_offset + 1); // the "why" is always the next QID
       let textQuestionData = getTextEntryQuestionData(
@@ -410,7 +432,7 @@ export const addQuestion = async (params) => {
         numChoices,
         expainQuestionText
       );
-      await createQuestion(surveyID, textQuestionData);
+      await createQuestion(surveyID, textQuestionData)
     }
     else if(questionType === "text"){
       let textGraphicData = getTextGraphicQuestionData(questionID,QID,questionText)
@@ -420,7 +442,7 @@ export const addQuestion = async (params) => {
       await createQuestion(surveyID, blankData);
     }
   }
-  await publishSurvey();
+  await publishNewVersion()
 };
 
 export const sendToUser = async (params) => {
